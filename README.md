@@ -1,6 +1,6 @@
-# 💼 PF Statement Management System
+#  PF Statement Management System
 
-## 📌 Project Overview
+##  Project Overview
 
 This is a full-stack web application developed to manage and calculate Provident Fund (PF) data for employees.
 The system allows users to add, update, and view PF records along with DA (Dearness Allowance) calculations.
@@ -9,7 +9,7 @@ This project was built as part of a full-stack development assignment.
 
 ---
 
-## 🚀 Features
+##  Features
 
 * ➕ Add employee PF details
 * 📊 Calculate DA (Dearness Allowance)
