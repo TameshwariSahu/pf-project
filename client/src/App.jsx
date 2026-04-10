@@ -1,0 +1,158 @@
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from "react-router-dom";
+import PFStatement from "./components/PFStatement";
+import Login from "./components/Login";
+import ViewData from "./components/ViewData";
+import UserView from "./components/UserView";
+import CreateDAM from "./components/CreateDAM";
+import LogoutButton from "./components/LogoutButton";
+import Register from "./components/Register";
+
+function App() {
+  const [user, setUser] = useState(null);
+  const [loginType, setLoginType] = useState("normal");
+  const [year, setYear] = useState(2008);
+
+  const RequireAuth = ({ children }) => {
+    return user ? children : <Navigate to="/login" />;
+  };
+
+  return (
+    <Router>
+      <Routes>
+
+        {/* 🔴 LOGIN PAGE */}
+        <Route
+          path="/login"
+          element={
+            !user ? (
+              <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-400 to-blue-400">
+                
+                <div className="mb-8 flex gap-4 justify-center mt-20">
+                  <button
+                    onClick={() => setLoginType("normal")}
+                    className={`px-6 py-2 rounded-full font-semibold ${
+                      loginType === "normal"
+                        ? "bg-white text-purple-600"
+                        : "bg-purple-200 text-gray-700"
+                    }`}
+                  >
+                    User Login
+                  </button>
+
+                  <button
+                    onClick={() => setLoginType("finance")}
+                    className={`px-6 py-2 rounded-full font-semibold ${
+                      loginType === "finance"
+                        ? "bg-white text-purple-600"
+                        : "bg-purple-200 text-gray-700"
+                    }`}
+                  >
+                    Finance Login
+                  </button>
+                </div>
+
+                <Login
+                  setUser={setUser}
+                  isFinance={loginType === "finance"}
+                />
+              </div>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        {/* 🔴 HOME REDIRECT */}
+        <Route
+          path="/"
+          element={
+            <RequireAuth>
+              {user?.role === "finance" ? (
+                <Navigate to="/form" />
+              ) : (
+                <Navigate to="/userView" />
+              )}
+            </RequireAuth>
+          }
+        />
+
+        {/* 🔴 PF FORM */}
+        <Route
+          path="/form"
+          element={
+            <RequireAuth>
+              <div>
+                <div className="flex justify-end p-4">
+                  <LogoutButton setUser={setUser} />
+                </div>
+
+                {user?.role === "finance" && (
+                  <div className="flex gap-3 p-4">
+                    <Link to="/view" className="bg-blue-500 text-white px-4 py-2 rounded">
+                      View Data
+                    </Link>
+
+                  </div>
+                )}
+
+                <PFStatement user={user} />
+              </div>
+            </RequireAuth>
+          }
+        />
+
+        {/* 🔴 VIEW DATA */}
+        <Route
+          path="/view"
+          element={
+            <RequireAuth>
+              <div>
+                <LogoutButton setUser={setUser} />
+                <ViewData />
+              </div>
+            </RequireAuth>
+          }
+        />
+
+        {/* 🔴 USER VIEW */}
+        <Route
+          path="/userView"
+          element={
+            <RequireAuth>
+              <div>
+                <LogoutButton setUser={setUser} />
+                <UserView />
+              </div>
+            </RequireAuth>
+          }
+        />
+
+        {/* 🔴 CREATE DA */}
+        <Route
+          path="/da_m"
+          element={
+            <RequireAuth>
+              <div>
+                <LogoutButton setUser={setUser} />
+               <CreateDAM year={year} financeUser={user?.userid} />
+              </div>
+            </RequireAuth>
+          }
+        />
+
+        {/* 🔴 FALLBACK */}
+        <Route
+          path="*"
+          element={<Navigate to={user ? "/" : "/login"} />}
+        />
+
+        <Route path="/register" element={<Register />} />
+        
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
