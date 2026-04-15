@@ -23,6 +23,10 @@ app.use("/employee", employeeRoutes);
 const da_mRouter = require("./routes/pf/da_m");
 app.use("/da_m", da_mRouter);
 
-app.get("/", (req, res) => res.send("Backend working "));
-
+app.get("/", (req, res) => {
+  res.json({
+    status: "success",
+    message: "Backend is running 🚀"
+  });
+});
 app.listen(5000, () => console.log("Server running on 5000"));
