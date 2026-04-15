@@ -8,7 +8,7 @@ function ViewData() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:5000/pf/get-pf");
+      const res = await fetch("https://pf-backend-g33n.onrender.com/pf/get-pf");
       const data = await res.json();
       setRecords(data);
     } catch {

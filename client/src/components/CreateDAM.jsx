@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { BASE_URL } from "../config";
 
 function CreateDAM() {
   const [pfData, setPfData] = useState([]);
@@ -24,9 +25,7 @@ function CreateDAM() {
     setError("");
 
     try {
-      const res = await fetch(
-        `http://127.0.0.1:5000/da_m/get-all?employeeId=${employeeId}`
-      );
+      const res = await fetch(`${BASE_URL}/da_m/get-all?employeeId=${employeeId}`);
 
       const data = await res.json();
       setPfData(data);
@@ -53,7 +52,7 @@ function CreateDAM() {
     setCategory(value);
 
     try {
-      await fetch("http://127.0.0.1:5000/da_m/update-category", {
+      await fetch(`${BASE_URL}/da_m/update-category`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,7 +92,7 @@ function CreateDAM() {
     }
 
     try {
-      const res = await fetch("http://127.0.0.1:5000/da_m/apply-da", {
+      const res = await fetch(`${BASE_URL}/da_m/apply-da`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

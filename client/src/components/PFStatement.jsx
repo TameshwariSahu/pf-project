@@ -5,6 +5,7 @@ import logo from "./nmdc.png";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { BASE_URL } from "./config";
 
 function PFStatement({ user = {} }) {
   const months = ["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"];
@@ -111,7 +112,7 @@ useEffect(() => {
     setDa(newDA);
 
     try {
-      await fetch("http://127.0.0.1:5000/auth/save-da", {
+      await fetch("https://pf-backend-g33n.onrender.com/auth/save-da", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ year, startMonth: daStartMonth, percent: daPercent, pfNo })
@@ -126,7 +127,7 @@ useEffect(() => {
   const fetchPFData = async () => {
     if (!pfNo) {  return; }
     try {
-      const res = await fetch(`http://127.0.0.1:5000/pf/get-pf-by-emp/${pfNo}`);
+      const res = await fetch(`${BASE_URL}/pf/get-pf-by-emp/${pfNo}`);
       if (!res.ok) {  return; }
       const result = await res.json();
 
@@ -184,7 +185,7 @@ useEffect(() => {
     }));
 
     try {
-      const res = await fetch("http://127.0.0.1:5000/auth/save-pf", {
+      const res = await fetch("https://pf-backend-g33n.onrender.com/auth/save-pf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ empName, department, pfNo, created_by: user?.userid, data })

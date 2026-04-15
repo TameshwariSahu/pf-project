@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import BASE_URL from "../config";
 
 function Login({ setUser, isFinance }) {   // ❌ setPage hata diya
   const [userid, setUserid] = useState("");
@@ -16,9 +17,9 @@ function Login({ setUser, isFinance }) {   // ❌ setPage hata diya
 
   const handleLogin = async () => {
     try {
-      const url = isFinance
-        ? "http://127.0.0.1:5000/auth/finance-login"
-        : "http://127.0.0.1:5000/auth/login";
+     const url = isFinance
+  ? `${BASE_URL}/auth/finance-login`
+  : `${BASE_URL}/auth/login`;
 
       const res = await fetch(url, {
         method: "POST",
