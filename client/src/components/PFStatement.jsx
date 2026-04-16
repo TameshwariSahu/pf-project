@@ -112,7 +112,7 @@ useEffect(() => {
     setDa(newDA);
 
     try {
-      await fetch("https://pf-backend-g33n.onrender.com/auth/save-da", {
+      await fetch("https://pf-project-backend.onrender.com/auth/save-da", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ year, startMonth: daStartMonth, percent: daPercent, pfNo })
@@ -185,7 +185,7 @@ useEffect(() => {
     }));
 
     try {
-      const res = await fetch("https://pf-backend-g33n.onrender.com/auth/save-pf", {
+      const res = await fetch("https://pf-project-backend.onrender.com/auth/save-pf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ empName, department, pfNo, created_by: user?.userid, data })
