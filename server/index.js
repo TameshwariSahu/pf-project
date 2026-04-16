@@ -12,7 +12,7 @@ const corsOptions = {
     "http://localhost:5173",
     "http://127.0.0.1:5173",
      "https://pf-statement.netlify.app",
-    "https://pf-project-backend.onrender.com"
+    "https://pf-backend-g33n.onrender.com"
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
