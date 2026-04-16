@@ -2,8 +2,6 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const db = require("../../db");
-const cors = require("cors");
-router.use(cors());
 
 // Create admin user
 router.get("/create-user", async (req, res) => {
