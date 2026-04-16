@@ -5,8 +5,17 @@ const app = express();
 require("dotenv").config();
 
 app.use(cors({
-    origin: "*"
+  origin: [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://pf-project-backend.onrender.com"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true
 }));
+
+app.use(express.json());
+
 app.use(express.json());
 
 // 🔹 Auth routes
@@ -26,10 +35,17 @@ app.use("/employee", employeeRoutes);
 const da_mRouter = require("./routes/pf/da_m");
 app.use("/da_m", da_mRouter);
 
+// app.get("/", (req, res) => {
+//   res.json({
+//     status: "success",
+//     message: "Backend is running 🚀"
+//   });
+// });
 app.get("/", (req, res) => {
-  res.json({
-    status: "success",
-    message: "Backend is running 🚀"
-  });
+  res.send("Backend working ✅");
 });
-app.listen(5000, () => console.log("Server running on 5000"));
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log("Server running on", PORT);
+});
