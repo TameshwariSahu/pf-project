@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { BASE_URL } from "../config";
+import BASE_URL from "../config";
 
 function CreateDAM() {
   const [pfData, setPfData] = useState([]);
