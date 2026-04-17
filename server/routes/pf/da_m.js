@@ -156,46 +156,44 @@ router.post("/update-category", async (req, res) => {
 router.post("/apply-da", async (req, res) => {
   try {
     const user = req.headers["x-user"] || "unknown";
+
     let { month, year, employeeId, da_percent, category } = req.body;
 
     console.log("INPUT:", req.body);
 
-    // 🔹 get actual employee id
-    const [emp] = await db.promise().query(
-      "SELECT id FROM employee_m WHERE LOWER(pf_no) = LOWER(?)",
-      [employeeId]
-    );
-
-    if (!emp.length) {
-      return res.status(404).send("Employee not found ❌");
+    if (!month || !year || !da_percent || !category) {
+      return res.status(400).send("All fields required ❌");
     }
 
-    const empId = emp[0].id;
-
-    // 🔹 insert/update da_m
+    // ✅ Insert / Update DA table
     await db.promise().query(
       `INSERT INTO da_m (year, month, da_percent, category, created_by)
        VALUES (?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE
-       da_percent = VALUES(da_percent),
-       category = VALUES(category),
-       created_by = VALUES(created_by)`,
+         da_percent = VALUES(da_percent),
+         category = VALUES(category),
+         created_by = VALUES(created_by)`,
       [year, month, da_percent, category, user]
     );
 
-    // 🔥 FIXED UPDATE
+    // 🔥 MAIN FIX → CATEGORY BASED UPDATE
     const [result] = await db.promise().query(
-      `UPDATE pf_t
-       SET da = ROUND(basic * ? / 100, 0)
-       WHERE employee = ?
-       AND LOWER(month) = LOWER(?)
-       AND year = ?`,
-      [da_percent, empId, month, year]
+      `UPDATE pf_t p
+       JOIN employee_m e ON p.employee = e.id
+       SET p.da = ROUND(p.basic * ? / 100, 0)
+       WHERE LOWER(p.month) = LOWER(?) 
+       AND p.year = ? 
+       AND e.category = ?`,
+      [da_percent, month, year, category]
     );
 
     console.log("Updated rows:", result.affectedRows);
 
-    res.send(`Updated rows: ${result.affectedRows} ✅`);
+    if (result.affectedRows === 0) {
+      return res.send("⚠️ No rows updated (check month/year/category)");
+    }
+
+    res.send(`DA applied to ${category} employees ✅`);
 
   } catch (err) {
     console.log(err);
