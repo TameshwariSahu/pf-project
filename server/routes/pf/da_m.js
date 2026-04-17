@@ -159,6 +159,9 @@ router.post("/apply-da", async (req, res) => {
 
     let { month, year, da_percent, category } = req.body;
 
+    console.log("employeeId received:", employeeId);
+    console.log("FULL BODY:", req.body);
+
     if (!month || !year || !da_percent || !category) {
       return res.status(400).send("All fields required ❌");
     }
