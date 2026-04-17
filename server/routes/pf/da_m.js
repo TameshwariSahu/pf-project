@@ -51,27 +51,21 @@ router.post("/update-category", async (req, res) => {
 router.post("/apply-da", async (req, res) => {
   try {
     const user = req.headers["x-user"] || "unknown";
-
     let { month, year, employeeId, da_percent, category } = req.body;
+
+    console.log({ month, year, employeeId, da_percent, category });
 
     if (!month || !year || !employeeId || !da_percent) {
       return res.status(400).send("All fields required ❌");
     }
 
-    // NULL → Worker
+    // update category
     await db.promise().query(
-      `UPDATE employee_m SET category = 'Worker' WHERE category IS NULL`
+      `UPDATE employee_m SET category = ? WHERE pf_no = ?`,
+      [category, employeeId]
     );
 
-    // Update category
-    if (category) {
-      await db.promise().query(
-        `UPDATE employee_m SET category = ? WHERE pf_no = ?`,
-        [category, employeeId]
-      );
-    }
-
-    // Insert DA
+    // insert da
     await db.promise().query(
       `INSERT INTO da_m (year, month, da_percent, category, created_by)
        VALUES (?, ?, ?, ?, ?)
@@ -82,16 +76,21 @@ router.post("/apply-da", async (req, res) => {
       [year, month, da_percent, category, user]
     );
 
-    // Update PF
-    await db.promise().query(
+    // update pf_t
+    const [result] = await db.promise().query(
       `UPDATE pf_t p
        JOIN employee_m e ON p.employee = e.id
        SET p.da = ROUND(p.basic * ? / 100, 0)
-       WHERE p.month = ? AND p.year = ? AND e.category = ?`,
-      [da_percent, month, year, category]
+       WHERE p.month = ? 
+       AND p.year = ? 
+       AND e.category = ?
+       AND e.pf_no = ?`,
+      [da_percent, month, year, category, employeeId]
     );
 
-    res.send(`DA applied to ${category} employees ✅`);
+    console.log("Rows updated:", result.affectedRows);
+
+    res.send(`DA applied ✅ Rows updated: ${result.affectedRows}`);
 
   } catch (err) {
     console.log(err);
