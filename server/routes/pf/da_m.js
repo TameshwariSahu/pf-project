@@ -157,15 +157,19 @@ router.post("/apply-da", async (req, res) => {
   try {
     const user = req.headers["x-user"] || "unknown";
 
-    let { month, year, employeeId, da_percent, category } = req.body;
+    let { month, year, da_percent, category } = req.body;
 
-    console.log("INPUT:", req.body);
+    // ✅ CLEAN INPUT
+    const cleanMonth = month?.trim();
+    const cleanCategory = category?.trim();
 
-    if (!month || !year || !da_percent || !category) {
+    console.log("INPUT:", { cleanMonth, year, da_percent, cleanCategory });
+
+    if (!cleanMonth || !year || !da_percent || !cleanCategory) {
       return res.status(400).send("All fields required ❌");
     }
 
-    // ✅ Insert / Update DA table
+    // ✅ STEP 1: Insert / Update da_m
     await db.promise().query(
       `INSERT INTO da_m (year, month, da_percent, category, created_by)
        VALUES (?, ?, ?, ?, ?)
@@ -173,27 +177,40 @@ router.post("/apply-da", async (req, res) => {
          da_percent = VALUES(da_percent),
          category = VALUES(category),
          created_by = VALUES(created_by)`,
-      [year, month, da_percent, category, user]
+      [year, cleanMonth, da_percent, cleanCategory, user]
     );
 
-    // 🔥 MAIN FIX → CATEGORY BASED UPDATE
-    const [result] = await db.promise().query(
-      `UPDATE pf_t p
-       JOIN employee_m e ON p.employee = e.id
-       SET p.da = ROUND(p.basic * ? / 100, 0)
-       WHERE LOWER(p.month) = LOWER(?) 
-       AND p.year = ? 
-       AND e.category = ?`,
-      [da_percent, month, year, category]
+    // ✅ STEP 2: Get ALL employee IDs of that category
+    const [employees] = await db.promise().query(
+      `SELECT id FROM employee_m WHERE LOWER(category) = LOWER(?)`,
+      [cleanCategory]
     );
 
-    console.log("Updated rows:", result.affectedRows);
-
-    if (result.affectedRows === 0) {
-      return res.send("⚠️ No rows updated (check month/year/category)");
+    if (employees.length === 0) {
+      return res.send("⚠️ No employees found for this category");
     }
 
-    res.send(`DA applied to ${category} employees ✅`);
+    const empIds = employees.map(e => e.id);
+
+    console.log("Employee IDs:", empIds);
+
+    // ✅ STEP 3: Update pf_t using employee IDs (NO JOIN ISSUE)
+    const [result] = await db.promise().query(
+      `UPDATE pf_t
+       SET da = ROUND(basic * ? / 100, 0)
+       WHERE LOWER(month) = LOWER(?) 
+       AND year = ?
+       AND employee IN (?)`,
+      [da_percent, cleanMonth, year, empIds]
+    );
+
+    console.log("Rows updated:", result.affectedRows);
+
+    if (result.affectedRows === 0) {
+      return res.send("⚠️ No PF rows updated (check month/year data)");
+    }
+
+    res.send(`✅ DA applied to ${result.affectedRows} records`);
 
   } catch (err) {
     console.log(err);
