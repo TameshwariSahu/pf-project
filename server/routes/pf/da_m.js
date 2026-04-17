@@ -163,9 +163,9 @@ router.post("/apply-da", async (req, res) => {
       return res.status(400).send("All fields required ❌");
     }
 
-    console.log("APPLY DA:", { month, year, da_percent, category });
+    console.log("DA APPLY REQUEST:", req.body);
 
-    // ✅ STEP 1: Insert / Update DA master
+    // 🔹 STEP 1: Insert / Update DA master table
     await db.promise().query(
       `INSERT INTO da_m (year, month, da_percent, category, created_by)
        VALUES (?, ?, ?, ?, ?)
@@ -176,24 +176,28 @@ router.post("/apply-da", async (req, res) => {
       [year, month, da_percent, category, user]
     );
 
-    // ✅ STEP 2: Update ALL employees of that category
+    // 🔹 STEP 2: Update PF table (FIXED: case-insensitive category match)
     const [result] = await db.promise().query(
       `UPDATE pf_t p
        JOIN employee_m e ON p.employee = e.id
        SET p.da = ROUND(p.basic * ? / 100, 0)
        WHERE p.month = ?
        AND p.year = ?
-       AND e.category = ?`,
+       AND LOWER(e.category) = LOWER(?)`,
       [da_percent, month, year, category]
     );
 
-    console.log("Rows updated:", result.affectedRows);
+    console.log("PF rows updated:", result.affectedRows);
 
-    res.send(`✅ DA applied to ${result.affectedRows} records`);
+    if (result.affectedRows === 0) {
+      return res.status(400).send("No PF rows updated ❌ (check category/month/year)");
+    }
+
+    res.send(`✅ DA applied successfully to ${result.affectedRows} records`);
 
   } catch (err) {
     console.log("ERROR:", err);
-    res.status(500).send("Error ❌");
+    res.status(500).send("Server Error ❌");
   }
 });
 
