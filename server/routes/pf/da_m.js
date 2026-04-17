@@ -157,50 +157,47 @@ router.post("/apply-da", async (req, res) => {
   try {
     const user = req.headers["x-user"] || "unknown";
 
-    let { month, year, da_percent, category } = req.body;
+    let { month, year, employeeId, da_percent, category } = req.body;
 
-    console.log("employeeId received:", employeeId);
-    console.log("FULL BODY:", req.body);
+    console.log("REQ BODY:", req.body); // DEBUG
 
-    if (!month || !year || !da_percent || !category) {
-      return res.status(400).send("All fields required ❌");
+    if (!month || !year || !employeeId || !da_percent) {
+      return res.status(400).send("Missing fields ❌");
     }
 
-    console.log("DA APPLY REQUEST:", req.body);
+    // normalize
+    employeeId = employeeId.toLowerCase();
 
-    // 🔹 STEP 1: Insert / Update DA master table
+    await db.promise().query(
+      `UPDATE employee_m 
+       SET category = COALESCE(?, category) 
+       WHERE LOWER(pf_no) = LOWER(?)`,
+      [category, employeeId]
+    );
+
     await db.promise().query(
       `INSERT INTO da_m (year, month, da_percent, category, created_by)
        VALUES (?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE
-         da_percent = VALUES(da_percent),
-         category = VALUES(category),
-         created_by = VALUES(created_by)`,
+       da_percent = VALUES(da_percent),
+       category = VALUES(category),
+       created_by = VALUES(created_by)`,
       [year, month, da_percent, category, user]
     );
 
-    // 🔹 STEP 2: Update PF table (FIXED: case-insensitive category match)
-    const [result] = await db.promise().query(
+    await db.promise().query(
       `UPDATE pf_t p
        JOIN employee_m e ON p.employee = e.id
        SET p.da = ROUND(p.basic * ? / 100, 0)
-       WHERE p.month = ?
-       AND p.year = ?
-       AND LOWER(e.category) = LOWER(?)`,
-      [da_percent, month, year, category]
+       WHERE p.month = ? AND p.year = ? AND LOWER(e.pf_no) = LOWER(?)`,
+      [da_percent, month, year, employeeId]
     );
 
-    console.log("PF rows updated:", result.affectedRows);
-
-    if (result.affectedRows === 0) {
-      return res.status(400).send("No PF rows updated ❌ (check category/month/year)");
-    }
-
-    res.send(`✅ DA applied successfully to ${result.affectedRows} records`);
+    res.send("DA applied successfully ✅");
 
   } catch (err) {
-    console.log("ERROR:", err);
-    res.status(500).send("Server Error ❌");
+    console.log("DA ERROR:", err);
+    res.status(500).send("Server error ❌");
   }
 });
 
