@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import BASE_URL from "../config";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 function Register() {
   const [userid, setUserid] = useState("");

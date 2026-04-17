@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import BASE_URL from "../config";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 function CreateDAM() {
   const [pfData, setPfData] = useState([]);

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import logo from "../components/nmdc.png";
-import BASE_URL from "../config";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 function UserView() {
   const [pfNo, setPfNo] = useState("");

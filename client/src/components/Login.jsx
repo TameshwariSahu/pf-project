@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import BASE_URL from "../config";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 function Login({ setUser, isFinance }) {   // ❌ setPage hata diya
   const [userid, setUserid] = useState("");

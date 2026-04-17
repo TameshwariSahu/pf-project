@@ -5,7 +5,7 @@ import logo from "./nmdc.png";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import BASE_URL from "../config";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 function PFStatement({ user = {} }) {
   const months = ["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"];
