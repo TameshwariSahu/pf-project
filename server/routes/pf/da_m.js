@@ -156,52 +156,46 @@ router.post("/update-category", async (req, res) => {
 router.post("/apply-da", async (req, res) => {
   try {
     const user = req.headers["x-user"] || "unknown";
-
     let { month, year, employeeId, da_percent, category } = req.body;
 
-    console.log("APPLY DA INPUT:", { month, year, employeeId, da_percent, category });
+    console.log("INPUT:", req.body);
 
-    if (!month || !year || !employeeId || !da_percent) {
-      return res.status(400).send("All fields required ❌");
+    // 🔹 get actual employee id
+    const [emp] = await db.promise().query(
+      "SELECT id FROM employee_m WHERE LOWER(pf_no) = LOWER(?)",
+      [employeeId]
+    );
+
+    if (!emp.length) {
+      return res.status(404).send("Employee not found ❌");
     }
 
-    // ✅ Update category (if changed)
-    if (category) {
-      await db.promise().query(
-        `UPDATE employee_m SET category = ? WHERE LOWER(pf_no) = LOWER(?)`,
-        [category, employeeId]
-      );
-    }
+    const empId = emp[0].id;
 
-    // ✅ INSERT / UPDATE da_m table
+    // 🔹 insert/update da_m
     await db.promise().query(
       `INSERT INTO da_m (year, month, da_percent, category, created_by)
        VALUES (?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE
-         da_percent = VALUES(da_percent),
-         category = VALUES(category),
-         created_by = VALUES(created_by)`,
+       da_percent = VALUES(da_percent),
+       category = VALUES(category),
+       created_by = VALUES(created_by)`,
       [year, month, da_percent, category, user]
     );
 
-    // 🔥 MAIN FIX: update PF using pf_no (NOT category)
+    // 🔥 FIXED UPDATE
     const [result] = await db.promise().query(
-      `UPDATE pf_t p
-       JOIN employee_m e ON p.employee = e.id
-       SET p.da = ROUND(p.basic * ? / 100, 0)
-       WHERE p.month = ? 
-       AND p.year = ? 
-       AND LOWER(e.pf_no) = LOWER(?)`,
-      [da_percent, month, year, employeeId]
+      `UPDATE pf_t
+       SET da = ROUND(basic * ? / 100, 0)
+       WHERE employee = ?
+       AND LOWER(month) = LOWER(?)
+       AND year = ?`,
+      [da_percent, empId, month, year]
     );
 
-    console.log("Rows updated:", result.affectedRows);
+    console.log("Updated rows:", result.affectedRows);
 
-    if (result.affectedRows === 0) {
-      return res.send("No PF rows updated ⚠️ (check month/year/pf_no)");
-    }
-
-    res.send(`DA applied successfully ✅`);
+    res.send(`Updated rows: ${result.affectedRows} ✅`);
 
   } catch (err) {
     console.log(err);
