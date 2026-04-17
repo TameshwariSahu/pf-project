@@ -39,7 +39,7 @@ function Login({ setUser, isFinance }) {   // ❌ setPage hata diya
       if (data.userid) {
         localStorage.setItem("role", data.role);
         localStorage.setItem("userid", data.userid);
-        sessionStorage.setItem("empId", data.pf_no); 
+        sessionStorage.setItem("empId", data.employeeId || data.userid);
         sessionStorage.setItem("financeUser", data.userid); 
 
 
