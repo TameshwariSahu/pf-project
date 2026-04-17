@@ -7,6 +7,7 @@ function Login({ setUser, isFinance }) {   // ❌ setPage hata diya
 
   // ✅ Auto login (only setUser)
   useEffect(() => {
+    console.log("BASE_URL:", BASE_URL);
     const storedUser = localStorage.getItem("userid");
     const storedRole = localStorage.getItem("role");
 
@@ -27,6 +28,8 @@ function Login({ setUser, isFinance }) {   // ❌ setPage hata diya
         body: JSON.stringify({ userid, password })
       });
 
+      
+
       if (!res.ok) {
         throw new Error("Server error");
       }
@@ -36,7 +39,7 @@ function Login({ setUser, isFinance }) {   // ❌ setPage hata diya
       if (data.userid) {
         localStorage.setItem("role", data.role);
         localStorage.setItem("userid", data.userid);
-        sessionStorage.setItem("employeeId", data.employeeId); 
+        sessionStorage.setItem("empId", data.pf_no); 
         sessionStorage.setItem("financeUser", data.userid); 
 
 
