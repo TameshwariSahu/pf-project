@@ -20,28 +20,28 @@ function CreateDAM() {
   if (!employeeId) return null;
 
   // 🔹 FETCH PF DATA (WITH CATEGORY)
-  const fetchPF = async () => {
-    setLoading(true);
-    setError("");
+const fetchPF = async () => {
+  setLoading(true);
+  setError("");
 
-    try {
-      const res = await fetch(`${BASE_URL}/da_m/get-all?employeeId=${employeeId}`);
+  try {
+    const res = await fetch(
+      `${BASE_URL}/da_m/get-all?employeeId=${employeeId}`
+    );
 
-      const data = await res.json();
-      setPfData(data);
+    const data = await res.json();
+    setPfData([...data]); // force re-render
 
-      // ✅ set category from fetched PF data
-      if (data.length > 0) {
-        setCategory(data[0].category || "Worker");
-      }
-
-    } catch (err) {
-      console.log(err);
-      setError("Error fetching ❌");
-    } finally {
-      setLoading(false);
+    if (data.length > 0) {
+      setCategory(data[0].category || "Worker");
     }
-  };
+  } catch (err) {
+    console.log(err);
+    setError("Error fetching ❌");
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchPF();
@@ -101,11 +101,14 @@ function CreateDAM() {
         body: JSON.stringify({
           month,
           year,
-          employeeId,
           da_percent: Number(daPercent),
           category
         })
       });
+
+      if (!res.ok) {
+            throw new Error("Failed to apply DA");
+          }
 
       const msg = await res.text();
       alert(msg);
