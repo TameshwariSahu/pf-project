@@ -8,6 +8,7 @@ function Login({ setUser, isFinance }) {   // ❌ setPage hata diya
   // ✅ Auto login (only setUser)
   useEffect(() => {
     console.log("BASE_URL:", BASE_URL);
+    console.log(import.meta.env);
     const storedUser = localStorage.getItem("userid");
     const storedRole = localStorage.getItem("role");
 
