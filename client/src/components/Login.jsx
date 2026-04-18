@@ -9,6 +9,7 @@ function Login({ setUser, isFinance }) {   // ❌ setPage hata diya
   useEffect(() => {
     console.log("BASE_URL:", BASE_URL);
     console.log(import.meta.env);
+    console.log(import.meta.env.VITE_BASE_URL);
     const storedUser = localStorage.getItem("userid");
     const storedRole = localStorage.getItem("role");
 
