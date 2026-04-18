@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 function ViewData() {
   const [records, setRecords] = useState([]);
@@ -8,7 +9,7 @@ function ViewData() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("https://pf-backend-g33n.onrender.com/pf/get-pf");
+      const res = await fetch(`${BASE_URL}/pf/get-pf`);
       const data = await res.json();
       setRecords(data);
     } catch {
