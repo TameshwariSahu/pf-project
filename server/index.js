@@ -6,7 +6,8 @@ const app = express();
 
 // ✅ Proper CORS
 app.use(cors({
-  origin: true,
+  origin: 'https://pf-project-frontend-5yrq1r0p7-tameshwarisahus-projects.vercel.app',
+  
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
 }));
