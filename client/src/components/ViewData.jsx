@@ -10,7 +10,7 @@ function ViewData() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/pf/get-pf-by-emp/${pfNo}`);
+      const res = await fetch(`${BASE_URL}/pf/get-pf`);
       const data = await res.json();
         setRecords(data);
   } catch {
