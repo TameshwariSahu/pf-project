@@ -112,7 +112,7 @@ useEffect(() => {
     setDa(newDA);
 
     try {
-      await fetch("https://pf-project-backend.onrender.com/auth/save-da", {
+      await fetch("https://pf-backend-g33n.onrender.com/auth/save-da", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ year, startMonth: daStartMonth, percent: daPercent, pfNo })
