@@ -6,15 +6,18 @@ function ViewData() {
   const [records, setRecords] = useState([]);
   const [pfNo, setPfNo] = useState("");
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     try {
       const res = await fetch(`${BASE_URL}/pf/get-pf`);
       const data = await res.json();
-      setRecords(data);
-    } catch {
-      alert("Error fetching ❌");
-    }
+        setRecords(data);
+  } catch {
+    alert("Error fetching ❌");
+  } finally {
+    setLoading(false);
+  }
   };
 
   useEffect(() => {
@@ -46,18 +49,24 @@ function ViewData() {
         </thead>
 
         <tbody>
-          {records.map((r, i) => (
-            <tr key={i}>
-              <td>{r.name}</td>
-              <td>{r.month}</td>
-              <td>{r.year}</td>
-              <td>{r.basic}</td>
-              <td>{r.da}</td>
-              <td>{r.employee_share}</td>
-              <td>{r.employer_share}</td>
-            </tr>
-          ))}
-        </tbody>
+  {records?.length > 0 ? (
+    records.map((r, i) => (
+      <tr key={i}>
+        <td>{r.name}</td>
+        <td>{r.month}</td>
+        <td>{r.year}</td>
+        <td>{r.basic}</td>
+        <td>{r.da}</td>
+        <td>{r.employee_share}</td>
+        <td>{r.employer_share}</td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="7">No data found</td>
+    </tr>
+  )}
+</tbody>
       </table>
 
       <button
