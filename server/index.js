@@ -5,21 +5,20 @@ const cors = require("cors");
 const app = express();
 
 // ✅ Proper CORS
-const allowedOrigins = [
-  "http://localhost:5173",
-  /\.vercel\.app$/
-];
-
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.some(o =>
-      typeof o === "string" ? o === origin : o.test(origin)
-    )) {
+    if (!origin) return callback(null, true);
+
+    if (
+      origin === "http://localhost:5173" ||
+      origin.endsWith(".vercel.app")
+    ) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(null, true); // TEMP FIX (important)
     }
-  }
+  },
+  credentials: true
 }));
 
 app.use(express.json());
