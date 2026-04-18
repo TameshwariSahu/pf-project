@@ -6,18 +6,8 @@ const app = express();
 
 // ✅ Proper CORS
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-
-    if (
-      origin === "http://localhost:5173" ||
-      origin.endsWith(".vercel.app")
-    ) {
-      callback(null, true);
-    } else {
-      callback(null, true); // TEMP FIX (important)
-    }
-  },
+  origin: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
 }));
 
