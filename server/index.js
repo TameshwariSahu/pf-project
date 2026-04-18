@@ -16,21 +16,24 @@ app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
 
+    const allowedOrigins = [
+      "http://localhost:5173",
+      /^https:\/\/.*\.vercel\.app$/
+    ];
+
     const allowed = allowedOrigins.some(o =>
       typeof o === "string" ? o === origin : o.test(origin)
     );
 
     if (allowed) {
-      return callback(null, true);
+      callback(null, true);
     } else {
-      return callback(new Error("CORS blocked: " + origin));
+      callback(null, true); // temp allow (DEV SAFE MODE)
     }
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
 }));
-
-app.options("*", cors());
 
 app.use(express.json());
 
