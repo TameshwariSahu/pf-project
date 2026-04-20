@@ -86,17 +86,26 @@ const handleApplyDA = async (month, year) => {
   const key = `${month}-${year}`;
   const daPercent = daValues[key];
 
-  if (!daPercent) {
-    alert("Enter DA % ❌");
+  const percent = Number(daPercent);
+
+  if (!percent || isNaN(percent)) {
+    alert("Enter valid DA % ❌");
     return;
   }
 
-  console.log("DA APPLY DATA:", {
+  if (!category) {
+    alert("Category missing ❌");
+    return;
+  }
+
+  const payload = {
     month,
-    year,
-    da_percent: Number(daPercent),
+    year: Number(year),
+    da_percent: percent,
     category
-  });
+  };
+
+  console.log("DA PAYLOAD:", payload);
 
   try {
     const res = await fetch(`${BASE_URL}/da_m/apply-da`, {
@@ -105,29 +114,23 @@ const handleApplyDA = async (month, year) => {
         "Content-Type": "application/json",
         "x-user": user
       },
-      body: JSON.stringify({
-        month,
-        year,
-        da_percent: Number(daPercent),
-        category
-      })
+      body: JSON.stringify(payload)
     });
 
-    const msg = await res.text();
+    const data = await res.text();
 
-    if (res.ok) {
-      alert("DA Applied + Saved ✅");
-    } else {
-      alert("DA Save Failed ❌");
+    if (!res.ok) {
+      console.log("Backend error:", data);
+      throw new Error(data);
     }
 
-    fetchPF(); // refresh UI
+    alert("DA Applied ✅");
+    fetchPF();
 
   } catch (err) {
     console.log(err);
-    alert("Server Error ❌");
+    alert("Failed ❌ Check console");
   }
-  await fetchPF();
 };
 
   return (
