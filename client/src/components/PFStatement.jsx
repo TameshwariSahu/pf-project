@@ -32,9 +32,9 @@ useEffect(() => {
   const role = localStorage.getItem("role");
 
   if (!userid || !role) {
-    navigate("/login");
+    navigate("/login", { replace: true });
   }
-}, [navigate]);
+}, []);
 
 
   useEffect(() => {
@@ -51,6 +51,9 @@ useEffect(() => {
       setDepartment(parsed.department || "");
       setPfNo(parsed.pfNo || "");
     }
+     else {
+    fetchPFData();
+  }
   }, []);
 
   const clean = (val) => {

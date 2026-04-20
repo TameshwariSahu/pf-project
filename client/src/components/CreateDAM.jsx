@@ -127,6 +127,7 @@ const handleApplyDA = async (month, year) => {
     console.log(err);
     alert("Server Error ❌");
   }
+  await fetchPF();
 };
 
   return (
