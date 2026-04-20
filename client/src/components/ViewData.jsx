@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 function ViewData() {
@@ -7,26 +8,22 @@ function ViewData() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const navigate = useNavigate(); // ✅ FIX
+
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
     try {
-      console.log("API:", `${BASE_URL}/pf/get-pf`);
-
       const res = await fetch(`${BASE_URL}/pf/get-pf`);
 
-      if (!res.ok) {
-        throw new Error("Server error");
-      }
+      if (!res.ok) throw new Error("Server error");
 
       const data = await res.json();
-      console.log("DATA:", data);
-
       setRecords(data);
     } catch (err) {
-      console.error(err);
+      console.log(err);
       setError("Failed to fetch data ❌");
     } finally {
       setLoading(false);
@@ -38,7 +35,18 @@ function ViewData() {
 
   return (
     <div className="p-5">
-      <h2 className="text-xl font-bold mb-4 text-center">PF Records</h2>
+
+      {/* 🔙 BACK BUTTON */}
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">PF Records</h2>
+
+        <button
+          onClick={() => navigate("/form")}
+          className="bg-gray-800 text-white px-4 py-1 rounded hover:bg-gray-700"
+        >
+          ⬅ Back
+        </button>
+      </div>
 
       <table className="border w-full text-center">
         <thead className="bg-black text-white">
@@ -54,7 +62,7 @@ function ViewData() {
         </thead>
 
         <tbody>
-          {records && records.length > 0 ? (
+          {records.length > 0 ? (
             records.map((r, i) => (
               <tr key={i}>
                 <td>{r.name}</td>
