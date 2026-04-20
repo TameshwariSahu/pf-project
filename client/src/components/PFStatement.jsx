@@ -37,23 +37,23 @@ useEffect(() => {
 }, []);
 
 
-  useEffect(() => {
+useEffect(() => {
   const saved = sessionStorage.getItem("pfData");
 
-  if (!saved) {
+  if (saved) {
+    const parsed = JSON.parse(saved);
+
+    setBasic(parsed.basic || {});
+    setDa(parsed.da || {});
+    setVpf(parsed.vpf || {});
+    setEps(parsed.eps || {});
+    setEmpName(parsed.empName || "");
+    setDepartment(parsed.department || "");
+    setPfNo(parsed.pfNo || "");
+
+  } else if (pfNo) {
     fetchPFData();
-    return;
   }
-
-  const parsed = JSON.parse(saved);
-
-  setBasic(parsed.basic || {});
-  setDa(parsed.da || {});
-  setVpf(parsed.vpf || {});
-  setEps(parsed.eps || {});
-  setEmpName(parsed.empName || "");
-  setDepartment(parsed.department || "");
-  setPfNo(parsed.pfNo || "");
 }, []);
 
   const clean = (val) => {
@@ -171,7 +171,7 @@ useEffect(() => {
     }
   };
 
-  useEffect(() => {
+  const saveSessionData = () => {
   sessionStorage.setItem("pfData", JSON.stringify({
     basic,
     da,
@@ -181,23 +181,25 @@ useEffect(() => {
     department,
     pfNo
   }));
-}, [basic, da, vpf, eps, empName, department, pfNo]);
-
-  useEffect(() => {
+};
+ useEffect(() => {
   const saved = sessionStorage.getItem("pfData");
 
-  if (!saved) return;
+  if (saved) {
+    const parsed = JSON.parse(saved);
 
-  const parsed = JSON.parse(saved);
+    setBasic(parsed.basic || {});
+    setDa(parsed.da || {});
+    setVpf(parsed.vpf || {});
+    setEps(parsed.eps || {});
+    setEmpName(parsed.empName || "");
+    setDepartment(parsed.department || "");
+    setPfNo(parsed.pfNo || "");
 
-  setBasic(parsed.basic || {});
-  setDa(parsed.da || {});
-  setVpf(parsed.vpf || {});
-  setEps(parsed.eps || {});
-  setEmpName(parsed.empName || "");
-  setDepartment(parsed.department || "");
-  setPfNo(parsed.pfNo || "");
-}, []);
+  } else if (pfNo) {
+    fetchPFData();
+  }
+}, [pfNo]);
 
   // Save PF data
   const saveToDB = async () => {
@@ -312,32 +314,23 @@ useEffect(() => {
         <div className="flex gap-2">
           <input className="border px-2 py-1 rounded" value={pfNo} placeholder="PF Number" onChange={e => setPfNo(e.target.value)} />
           <button onClick={fetchPFData} className="bg-blue-500 text-white px-3 py-1 rounded">Fetch</button>
-       <button
-  onClick={() => {
-    if (!pfNo) {
-      alert("Enter PF Number first ❌");
-      return;
-    }
+          <button
+          onClick={() => {
+            if (!pfNo) {
+              alert("Enter PF Number first ❌");
+              return;
+            }
 
-    sessionStorage.setItem("empId", pfNo);
+            saveSessionData(); // ✅ SAVE ONCE ONLY
 
-    // ✅ SAVE FULL STATE BEFORE NAVIGATE
-    sessionStorage.setItem("pfData", JSON.stringify({
-      basic,
-      da,
-      vpf,
-      eps,
-      empName,
-      department,
-      pfNo
-    }));
+            sessionStorage.setItem("empId", pfNo);
 
-    navigate("/da_m", { state: { employeeId: pfNo } });
-  }}
-  className="bg-purple-600 text-white px-4 py-1 rounded"
->
-  Go to DA Page
-</button>
+            navigate("/da_m", { state: { employeeId: pfNo } });
+          }}
+          className="bg-purple-600 text-white px-4 py-1 rounded"
+        >
+          Go to DA Page
+        </button>
         </div>
       </div>
 

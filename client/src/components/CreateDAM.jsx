@@ -86,26 +86,20 @@ const handleApplyDA = async (month, year) => {
   const key = `${month}-${year}`;
   const daPercent = daValues[key];
 
-  const percent = Number(daPercent);
-
-  if (!percent || isNaN(percent)) {
-    alert("Enter valid DA % ❌");
-    return;
-  }
-
-  if (!category) {
-    alert("Category missing ❌");
+  if (!daPercent) {
+    alert("Enter DA % ❌");
     return;
   }
 
   const payload = {
     month,
-    year: Number(year),
-    da_percent: percent,
-    category
+    year,
+    da_percent: Number(daPercent),
+    category: category || "Worker",
+    employeeId: employeeId
   };
 
-  console.log("DA PAYLOAD:", payload);
+  console.log("DA PAYLOAD 👉", payload);
 
   try {
     const res = await fetch(`${BASE_URL}/da_m/apply-da`, {
@@ -117,19 +111,14 @@ const handleApplyDA = async (month, year) => {
       body: JSON.stringify(payload)
     });
 
-    const data = await res.text();
+    if (!res.ok) throw new Error("Bad Request");
 
-    if (!res.ok) {
-      console.log("Backend error:", data);
-      throw new Error(data);
-    }
-
-    alert("DA Applied ✅");
+    alert("DA Applied + Saved ✅");
     fetchPF();
 
   } catch (err) {
     console.log(err);
-    alert("Failed ❌ Check console");
+    alert("Server Error ❌");
   }
 };
 
