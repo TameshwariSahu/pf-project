@@ -29,8 +29,8 @@ function PFStatement({ user = {} }) {
 //   }
 // }, [pfNo]);
 
-useEffect(() => {
-  const empId = sessionStorage.getItem("empId");
+// useEffect(() => {
+//   const empId = sessionStorage.getItem("empId");
 
 //   if (empId) {
 //     setPfNo();
