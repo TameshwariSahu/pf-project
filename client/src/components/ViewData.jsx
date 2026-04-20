@@ -8,7 +8,7 @@ function ViewData() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const navigate = useNavigate(); // ✅ FIX
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     fetchData();

@@ -85,6 +85,12 @@ const fetchPF = async () => {
   const handleApplyDA = async (month, year) => {
     const key = `${month}-${year}`;
     const daPercent = daValues[key];
+    console.log("DA APPLY DATA:", {
+      month,
+      year,
+      da_percent: Number(daPercent),
+      category
+    });
 
     if (!daPercent) {
       alert("Enter DA % ❌");
@@ -125,7 +131,7 @@ const fetchPF = async () => {
     <div className="p-5">
 
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/form")}
         className="bg-gray-500 text-white px-4 py-2 rounded mb-4"
       >
         ⬅ Back

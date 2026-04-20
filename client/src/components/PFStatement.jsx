@@ -22,7 +22,7 @@ function PFStatement({ user = {} }) {
   const [empName, setEmpName] = useState("");
   const [department, setDepartment] = useState("");
   // const [pfNo, setPfNo] = useState(() => sessionStorage.getItem("pfNo") || "");
-  const [pfNo, setPfNo] = useState("");
+  const [pfNo, setPfNo] = useState(() => sessionStorage.getItem("empId") || "");
 const navigate = useNavigate();
 
 const storedUser = JSON.parse(localStorage.getItem("user") || "null");
@@ -35,6 +35,24 @@ useEffect(() => {
     navigate("/login");
   }
 }, [navigate]);
+
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem("pfData");
+
+    if (saved) {
+      const parsed = JSON.parse(saved);
+
+      setBasic(parsed.basic || {});
+      setDa(parsed.da || {});
+      setVpf(parsed.vpf || {});
+      setEps(parsed.eps || {});
+      setEmpName(parsed.empName || "");
+      setDepartment(parsed.department || "");
+      setPfNo(parsed.pfNo || "");
+    }
+  }, []);
+
   const clean = (val) => {
   if (!val || Number(val) === 0) return "";
   return Math.round(val);
@@ -272,19 +290,32 @@ useEffect(() => {
         <div className="flex gap-2">
           <input className="border px-2 py-1 rounded" value={pfNo} placeholder="PF Number" onChange={e => setPfNo(e.target.value)} />
           <button onClick={fetchPFData} className="bg-blue-500 text-white px-3 py-1 rounded">Fetch</button>
-        <button
-            onClick={() => {
-              if (!pfNo) {
-                alert("Enter PF Number first ❌");
-                return;
-              }
-              sessionStorage.setItem("empId", pfNo);
-              navigate("/da_m", { state: { employeeId: pfNo } });
-            }}
-            className="bg-purple-600 text-white px-4 py-1 rounded"
-          >
-            Go to DA Page
-          </button>
+       <button
+  onClick={() => {
+    if (!pfNo) {
+      alert("Enter PF Number first ❌");
+      return;
+    }
+
+    sessionStorage.setItem("empId", pfNo);
+
+    // ✅ SAVE FULL STATE BEFORE NAVIGATE
+    sessionStorage.setItem("pfData", JSON.stringify({
+      basic,
+      da,
+      vpf,
+      eps,
+      empName,
+      department,
+      pfNo
+    }));
+
+    navigate("/da_m", { state: { employeeId: pfNo } });
+  }}
+  className="bg-purple-600 text-white px-4 py-1 rounded"
+>
+  Go to DA Page
+</button>
         </div>
       </div>
 
