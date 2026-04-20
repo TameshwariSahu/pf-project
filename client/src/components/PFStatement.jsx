@@ -32,7 +32,7 @@ function PFStatement({ user = {} }) {
 useEffect(() => {
   const empId = sessionStorage.getItem("empId");
 
-  if (empId) {
+  if (empId && !empId.includes("finance")) {
     setPfNo(empId);
   }
 }, []);
