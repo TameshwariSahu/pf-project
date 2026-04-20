@@ -29,13 +29,13 @@ function PFStatement({ user = {} }) {
 //   }
 // }, [pfNo]);
 
-useEffect(() => {
-  const empId = sessionStorage.getItem("empId");
+// useEffect(() => {
+//   const empId = sessionStorage.getItem("empId");
 
-  if (empId && !empId.includes("finance")) {
-    setPfNo(empId);
-  }
-}, []);
+//   if (empId && !empId.includes("finance")) {
+//     setPfNo(empId);
+//   }
+// }, []);
 
 useEffect(() => {
   const user = localStorage.getItem("user");
