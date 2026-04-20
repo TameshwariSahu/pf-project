@@ -134,7 +134,7 @@ const handleApplyDA = async (month, year) => {
     <div className="p-5">
 
       <button
-        onClick={() => navigate("/form")}
+       onClick={() => navigate("/form", { replace: true })}
         className="bg-gray-500 text-white px-4 py-2 rounded mb-4"
       >
         ⬅ Back

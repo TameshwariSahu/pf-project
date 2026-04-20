@@ -38,23 +38,23 @@ useEffect(() => {
 
 
   useEffect(() => {
-    const saved = sessionStorage.getItem("pfData");
+  const saved = sessionStorage.getItem("pfData");
 
-    if (saved) {
-      const parsed = JSON.parse(saved);
-
-      setBasic(parsed.basic || {});
-      setDa(parsed.da || {});
-      setVpf(parsed.vpf || {});
-      setEps(parsed.eps || {});
-      setEmpName(parsed.empName || "");
-      setDepartment(parsed.department || "");
-      setPfNo(parsed.pfNo || "");
-    }
-     else {
+  if (!saved) {
     fetchPFData();
+    return;
   }
-  }, []);
+
+  const parsed = JSON.parse(saved);
+
+  setBasic(parsed.basic || {});
+  setDa(parsed.da || {});
+  setVpf(parsed.vpf || {});
+  setEps(parsed.eps || {});
+  setEmpName(parsed.empName || "");
+  setDepartment(parsed.department || "");
+  setPfNo(parsed.pfNo || "");
+}, []);
 
   const clean = (val) => {
   if (!val || Number(val) === 0) return "";
@@ -65,15 +65,6 @@ useEffect(() => {
   const num = Number(val);
   return isNaN(num) ? 0 : num;
 };
-
-// useEffect(() => {
-//   const empId = sessionStorage.getItem("empId");
-
-//   if (empId) {
-//     setPfNo(empId);
-//     fetchPFData(); 
-//   }
-// }, []);
 
   const [daPercent, setDaPercent] = useState("");
   const [daStartMonth, setDaStartMonth] = useState("Apr");
@@ -179,6 +170,18 @@ useEffect(() => {
       toast.error("Error fetching ❌");
     }
   };
+
+  useEffect(() => {
+  sessionStorage.setItem("pfData", JSON.stringify({
+    basic,
+    da,
+    vpf,
+    eps,
+    empName,
+    department,
+    pfNo
+  }));
+}, [basic, da, vpf, eps, empName, department, pfNo]);
 
   useEffect(() => {
   const saved = sessionStorage.getItem("pfData");
@@ -400,16 +403,6 @@ useEffect(() => {
       </div>
 
       <ToastContainer />
-
-      {/* <button
-         onClick={() => {
-            sessionStorage.setItem("empId", pfNo);
-            navigate("/da_m", { state: { employeeId: pfNo } });
-          }}
-        className="bg-purple-600 text-white px-4 py-2 rounded"
-      >
-        Go to DA Page
-      </button> */}
     </div>
   );
 }
