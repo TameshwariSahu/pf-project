@@ -46,10 +46,9 @@ function Login({ setUser, isFinance }) {
         localStorage.setItem("role", data.role);
         localStorage.setItem("userid", data.userid);
 
-        // ✅ CLEAN SESSION HANDLING (MAIN FIX)
         if (isFinance) {
           sessionStorage.setItem("financeUser", data.userid);
-          sessionStorage.removeItem("empId");   // ❌ no PF leakage
+          sessionStorage.removeItem("empId");  
         } else {
           sessionStorage.setItem("empId", data.employeeId || "");
           sessionStorage.removeItem("financeUser");
@@ -58,7 +57,7 @@ function Login({ setUser, isFinance }) {
         setUser(data);
 
         // // ✅ redirect after login
-        // navigate("/form");
+        navigate("/form");
 
       } else {
         alert(data.message);

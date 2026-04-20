@@ -23,30 +23,18 @@ function PFStatement({ user = {} }) {
   const [department, setDepartment] = useState("");
   // const [pfNo, setPfNo] = useState(() => sessionStorage.getItem("pfNo") || "");
   const [pfNo, setPfNo] = useState("");
-//   useEffect(() => {
-//   if (pfNo) {
-//     fetchPFData(); 
-//   }
-// }, [pfNo]);
+const navigate = useNavigate();
 
-// useEffect(() => {
-//   const empId = sessionStorage.getItem("empId");
-
-//   if (empId && !empId.includes("finance")) {
-//     setPfNo(empId);
-//   }
-// }, []);
+const storedUser = JSON.parse(localStorage.getItem("user") || "null");
 
 useEffect(() => {
-  const user = localStorage.getItem("user");
+  const userid = localStorage.getItem("userid");
+  const role = localStorage.getItem("role");
 
-  if (!user) {
+  if (!userid || !role) {
     navigate("/login");
   }
-}, []);
-
-  const navigate = useNavigate();
-
+}, [navigate]);
   const clean = (val) => {
   if (!val || Number(val) === 0) return "";
   return Math.round(val);
