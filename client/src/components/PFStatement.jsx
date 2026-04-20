@@ -21,13 +21,13 @@ function PFStatement({ user = {} }) {
 
   const [empName, setEmpName] = useState("");
   const [department, setDepartment] = useState("");
-  const [pfNo, setPfNo] = useState(() => sessionStorage.getItem("pfNo") || "");
-
-  useEffect(() => {
-  if (pfNo) {
-    fetchPFData(); 
-  }
-}, [pfNo]);
+  // const [pfNo, setPfNo] = useState(() => sessionStorage.getItem("pfNo") || "");
+  const [pfNo, setPfNo] = useState("");
+//   useEffect(() => {
+//   if (pfNo) {
+//     fetchPFData(); 
+//   }
+// }, [pfNo]);
 
 useEffect(() => {
   const empId = sessionStorage.getItem("empId");
@@ -112,7 +112,7 @@ useEffect(() => {
     setDa(newDA);
 
     try {
-      await fetch("https://pf-backend-g33n.onrender.com/auth/save-da", {
+      await fetch(`${BASE_URL}/auth/save-da`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ year, startMonth: daStartMonth, percent: daPercent, pfNo })
