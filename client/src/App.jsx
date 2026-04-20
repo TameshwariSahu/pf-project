@@ -68,13 +68,15 @@ function App() {
         <Route
           path="/"
           element={
-            <RequireAuth>
-              {user?.role === "finance" ? (
+            user ? (
+              user.role === "finance" ? (
                 <Navigate to="/form" />
               ) : (
                 <Navigate to="/userView" />
-              )}
-            </RequireAuth>
+              )
+            ) : (
+              <Navigate to="/login" />
+            )
           }
         />
 

@@ -55,7 +55,7 @@ function Login({ setUser, isFinance }) {
           sessionStorage.removeItem("financeUser");
         }
 
-        // setUser(data);
+        setUser(data);
 
         // // ✅ redirect after login
         // navigate("/form");
