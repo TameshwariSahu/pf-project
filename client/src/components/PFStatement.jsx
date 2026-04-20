@@ -32,10 +32,10 @@ function PFStatement({ user = {} }) {
 useEffect(() => {
   const empId = sessionStorage.getItem("empId");
 
-  if (empId) {
-    setPfNo(empId);
-  }
-}, []);
+//   if (empId) {
+//     setPfNo();
+//   }
+// }, []);
 
   const navigate = useNavigate();
 
@@ -49,14 +49,14 @@ useEffect(() => {
   return isNaN(num) ? 0 : num;
 };
 
-useEffect(() => {
-  const empId = sessionStorage.getItem("empId");
+// useEffect(() => {
+//   const empId = sessionStorage.getItem("empId");
 
-  if (empId) {
-    setPfNo(empId);
-    fetchPFData(); 
-  }
-}, []);
+//   if (empId) {
+//     setPfNo(empId);
+//     fetchPFData(); 
+//   }
+// }, []);
 
   const [daPercent, setDaPercent] = useState("");
   const [daStartMonth, setDaStartMonth] = useState("Apr");
