@@ -9,21 +9,22 @@ function Login({ setUser, isFinance }) {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  // 🔥 clear old PF data once
+  // 🔥 clear old session once
   useEffect(() => {
     sessionStorage.removeItem("pfNo");
+    sessionStorage.removeItem("empId");
+    sessionStorage.removeItem("financeUser");
   }, []);
 
-  // ✅ Auto login 
-useEffect(() => {
-  const storedUser = localStorage.getItem("userid");
-  const storedRole = localStorage.getItem("role");
+  // ✅ restore login state (no redirect issue)
+  useEffect(() => {
+    const storedUser = localStorage.getItem("userid");
+    const storedRole = localStorage.getItem("role");
 
-  if (storedUser && storedRole) {
-    setUser({ userid: storedUser, role: storedRole });
-    navigate("/pf"); // keep only if you want auto redirect
-  }
-}, []);
+    if (storedUser && storedRole) {
+      setUser({ userid: storedUser, role: storedRole });
+    }
+  }, [setUser]);
 
   const handleLogin = async () => {
     try {
@@ -37,9 +38,7 @@ useEffect(() => {
         body: JSON.stringify({ userid, password })
       });
 
-      if (!res.ok) {
-        throw new Error("Server error");
-      }
+      if (!res.ok) throw new Error("Server error");
 
       const data = await res.json();
 
@@ -47,15 +46,19 @@ useEffect(() => {
         localStorage.setItem("role", data.role);
         localStorage.setItem("userid", data.userid);
 
-            if (!isFinance && data.employeeId) {
-        sessionStorage.setItem("empId", data.employeeId);
-      }
-        sessionStorage.setItem("financeUser", data.userid);
+        // ✅ CLEAN SESSION HANDLING (MAIN FIX)
+        if (isFinance) {
+          sessionStorage.setItem("financeUser", data.userid);
+          sessionStorage.removeItem("empId");   // ❌ no PF leakage
+        } else {
+          sessionStorage.setItem("empId", data.employeeId || "");
+          sessionStorage.removeItem("financeUser");
+        }
 
         setUser(data);
 
-        // 🔥 IMPORTANT FIX (redirect AFTER login)
-        navigate("/pf");
+        // ✅ redirect after login
+        navigate("/form");
 
       } else {
         alert(data.message);
@@ -63,7 +66,7 @@ useEffect(() => {
 
     } catch (err) {
       console.log(err);
-      alert(err.message || "Backend not connected ❌");
+      alert("Login error ❌");
     }
   };
 
