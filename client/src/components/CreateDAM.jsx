@@ -82,50 +82,52 @@ const fetchPF = async () => {
   };
 
   // 🔹 APPLY DA
-  const handleApplyDA = async (month, year) => {
-    const key = `${month}-${year}`;
-    const daPercent = daValues[key];
-    console.log("DA APPLY DATA:", {
-      month,
-      year,
-      da_percent: Number(daPercent),
-      category
+const handleApplyDA = async (month, year) => {
+  const key = `${month}-${year}`;
+  const daPercent = daValues[key];
+
+  if (!daPercent) {
+    alert("Enter DA % ❌");
+    return;
+  }
+
+  console.log("DA APPLY DATA:", {
+    month,
+    year,
+    da_percent: Number(daPercent),
+    category
+  });
+
+  try {
+    const res = await fetch(`${BASE_URL}/da_m/apply-da`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-user": user
+      },
+      body: JSON.stringify({
+        month,
+        year,
+        da_percent: Number(daPercent),
+        category
+      })
     });
 
-    if (!daPercent) {
-      alert("Enter DA % ❌");
-      return;
+    const msg = await res.text();
+
+    if (res.ok) {
+      alert("DA Applied + Saved ✅");
+    } else {
+      alert("DA Save Failed ❌");
     }
 
-    try {
-      const res = await fetch(`${BASE_URL}/da_m/apply-da`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user": user  
-        },
-        body: JSON.stringify({
-          month,
-          year,
-          da_percent: Number(daPercent),
-          category
-        })
-      });
+    fetchPF(); // refresh UI
 
-      if (!res.ok) {
-            throw new Error("Failed to apply DA");
-          }
-
-      const msg = await res.text();
-      alert(msg);
-
-      fetchPF();
-
-    } catch (err) {
-      console.log(err);
-      alert("Error ❌");
-    }
-  };
+  } catch (err) {
+    console.log(err);
+    alert("Server Error ❌");
+  }
+};
 
   return (
     <div className="p-5">

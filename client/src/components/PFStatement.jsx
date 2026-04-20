@@ -177,6 +177,22 @@ useEffect(() => {
     }
   };
 
+  useEffect(() => {
+  const saved = sessionStorage.getItem("pfData");
+
+  if (!saved) return;
+
+  const parsed = JSON.parse(saved);
+
+  setBasic(parsed.basic || {});
+  setDa(parsed.da || {});
+  setVpf(parsed.vpf || {});
+  setEps(parsed.eps || {});
+  setEmpName(parsed.empName || "");
+  setDepartment(parsed.department || "");
+  setPfNo(parsed.pfNo || "");
+}, []);
+
   // Save PF data
   const saveToDB = async () => {
     if (!empName.trim() || !department.trim() || !pfNo.trim()) {
