@@ -8,7 +8,8 @@ const db = mysql.createConnection({
   port: Number(process.env.DB_PORT),
   ssl: {
     rejectUnauthorized: false
-  }
+  },
+     timezone: '+05:30' 
 });
 
 db.connect((err) => {
@@ -16,7 +17,6 @@ db.connect((err) => {
     console.log("DB connection failed ❌", err);
   } else {
     console.log("DB connected ✅");
-    db.query("SET time_zone = '+05:30'");
   }
   console.log("HOST:", process.env.DB_HOST);
 });
