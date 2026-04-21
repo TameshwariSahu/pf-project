@@ -127,10 +127,10 @@ useEffect(() => {
   };
 
   // Fetch PF data
-  const fetchPFData = async () => {
-    if (!pfNo) {  return; }
+  const fetchPFData = async (id = pfNo) => {
+    if (!id) {  return; }
     try {
-      const res = await fetch(`${BASE_URL}/pf/get-pf-by-emp/${pfNo}`);
+      const res = await fetch(`${BASE_URL}/pf/get-pf-by-emp/${id}`);
       if (!res.ok) {  return; }
       const result = await res.json();
 
