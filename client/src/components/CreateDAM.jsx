@@ -15,8 +15,8 @@ function CreateDAM() {
   const employeeId =
     location.state?.employeeId || sessionStorage.getItem("empId");
 
-  const user = localStorage.getItem("userid");
-
+ const user = location.state?.user || localStorage.getItem("userid");
+console.log("USER:", user);
   if (!employeeId) return null;
 
   // 🔹 FETCH PF DATA (WITH CATEGORY)
