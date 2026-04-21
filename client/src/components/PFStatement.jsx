@@ -128,7 +128,7 @@ useEffect(() => {
 
   // Fetch PF data
   const fetchPFData = async () => {
-    if (!pfNo) {  return; }
+    if (!id) {  return; }
     try {
       const res = await fetch(`${BASE_URL}/pf/get-pf-by-emp/${pfNo}`);
       if (!res.ok) {  return; }
@@ -307,7 +307,18 @@ useEffect(() => {
         <input className="border px-2 py-1 rounded" value={department} placeholder="Department" onChange={e => setDepartment(e.target.value)} />
 
         <div className="flex gap-2">
-          <input className="border px-2 py-1 rounded" value={pfNo} placeholder="PF Number" onChange={e => setPfNo(e.target.value)} />
+        <input
+          className="border px-2 py-1 rounded"
+          value={pfNo}
+          placeholder="PF Number"
+          onChange={e => {
+            const val = e.target.value;
+            setPfNo(val);
+            if (val.length >= 5) { 
+              fetchPFData(val);
+            }
+          }}
+        />
           <button onClick={fetchPFData} className="bg-blue-500 text-white px-3 py-1 rounded">Fetch</button>
           <button
           onClick={() => {
