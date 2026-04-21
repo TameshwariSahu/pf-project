@@ -56,8 +56,11 @@ function Login({ setUser, isFinance }) {
 
         setUser(data);
 
-        // // ✅ redirect after login
-        navigate("/form");
+       if (data.role === "finance") {
+          navigate("/form");
+        } else {
+          navigate("/userView");
+        }
 
       } else {
         alert(data.message);
