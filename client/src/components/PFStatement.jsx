@@ -213,7 +213,7 @@ useEffect(() => {
     }));
 
     try {
-      const res = await fetch(`${BASE_URL}/pf/save-pf`, {
+      const res = await fetch(`${BASE_URL}/auth/save-pf`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ empName, department, pfNo, created_by: user?.userid, data })
