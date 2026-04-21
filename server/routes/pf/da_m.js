@@ -83,13 +83,20 @@ router.post("/apply-da", async (req, res) => {
       [year, month, da_percent, category, user]
     );
 
-      await db.promise().query(
-        `UPDATE pf_t p
-        JOIN employee_m e ON p.employee = e.id
-        SET p.da = ROUND(p.basic * ? / 100, 0)
-        WHERE p.month = ? AND p.year = ? AND e.category = ?`,
-        [da_percent, month, year, category]
-      );
+  const now = new Date();
+const IST = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+const istString = IST.toISOString().slice(0, 19).replace('T', ' ');
+
+await db.promise().query(
+  `INSERT INTO da_m (year, month, da_percent, category, created_by, created_at)
+   VALUES (?, ?, ?, ?, ?, ?)
+   ON DUPLICATE KEY UPDATE
+   da_percent = VALUES(da_percent),
+   category = VALUES(category),
+   created_by = VALUES(created_by),
+   created_at = VALUES(created_at)`,
+  [year, month, da_percent, category, user, istString] 
+);
 
     res.send("DA applied successfully ✅");
 
