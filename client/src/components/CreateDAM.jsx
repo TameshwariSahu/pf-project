@@ -15,7 +15,7 @@ function CreateDAM() {
   const employeeId =
     location.state?.employeeId || sessionStorage.getItem("empId");
 
-  const user = localStorage.getItem("user");
+  const user = localStorage.getItem("userid");
 
   if (!employeeId) return null;
 
