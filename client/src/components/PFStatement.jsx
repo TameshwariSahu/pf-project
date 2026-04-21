@@ -177,12 +177,10 @@ useEffect(() => {
     pfNo
   }));
 };
- useEffect(() => {
+useEffect(() => {
   const saved = sessionStorage.getItem("pfData");
-
   if (saved) {
     const parsed = JSON.parse(saved);
-
     setBasic(parsed.basic || {});
     setDa(parsed.da || {});
     setVpf(parsed.vpf || {});
@@ -190,11 +188,8 @@ useEffect(() => {
     setEmpName(parsed.empName || "");
     setDepartment(parsed.department || "");
     setPfNo(parsed.pfNo || "");
-
-  } else if (pfNo) {
-    fetchPFData();
   }
-}, [pfNo]);
+}, []);
 
   // Save PF data
   const saveToDB = async () => {
