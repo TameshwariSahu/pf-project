@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const db = require("../../db");
+const { getISTTime } = require('../../utils/time');
 
 // Create admin user
 router.get("/create-user", async (req, res) => {
@@ -38,6 +39,7 @@ router.post("/login", (req, res) => {
 });
 
 router.post("/save-da", (req, res) => {
+  const istString = getISTTime();
   const { year, startMonth, percent, created_by } = req.body;
 
   const checkSql = "SELECT * FROM da_m WHERE year=? AND month=?";
@@ -49,14 +51,12 @@ router.post("/save-da", (req, res) => {
     }
 
     if (result.length > 0) {
-      // ✅ UPDATE
       const updateSql = `
         UPDATE da_m 
-        SET da_percent=?, created_by=? 
+        SET da_percent=?, created_by=?, created_at=?
         WHERE year=? AND month=?
       `;
-
-      db.query(updateSql, [percent, created_by, year, startMonth], (err) => {
+      db.query(updateSql, [percent, created_by, istString, year, startMonth], (err) => {
         if (err) {
           console.log(err);
           return res.status(500).send("Error updating DA");
@@ -65,15 +65,13 @@ router.post("/save-da", (req, res) => {
       });
 
     } else {
-      // ✅ INSERT
       const insertSql = `
-        INSERT INTO da_m (year, month, da_percent, created_by)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO da_m (year, month, da_percent, created_by, created_at)
+        VALUES (?, ?, ?, ?, ?)
       `;
-
-      db.query(insertSql, [year, startMonth, percent, created_by], (err) => {
+      db.query(insertSql, [year, startMonth, percent, created_by, istString], (err) => {
         if (err) {
-          console.log("ERROR:",err);
+          console.log("ERROR:", err);
           return res.status(500).send("Error inserting DA");
         }
         res.send("DA saved successfully ✅");
@@ -97,9 +95,9 @@ router.post("/finance-login", (req, res) => {
 });
 
 router.post("/save-pf", (req, res) => {
+  const istString = getISTTime();
   const { empName, department, pfNo, created_by, data } = req.body;
 
-  // Step 1: check if employee exists
   db.query("SELECT id FROM employee_m WHERE pf_no=?", [pfNo], (err, result) => {
     if (err) {
       console.log(err);
@@ -112,15 +110,16 @@ router.post("/save-pf", (req, res) => {
 
       const sql = `
         INSERT INTO pf_t 
-        (employee, basic, da, vpf, month, year, created_by, employee_share, employer_share)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (employee, basic, da, vpf, month, year, created_by, employee_share, employer_share, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE
           basic=VALUES(basic),
           da=VALUES(da),
           vpf=VALUES(vpf),
           created_by=VALUES(created_by),
           employee_share=VALUES(employee_share),
-          employer_share=VALUES(employer_share)
+          employer_share=VALUES(employer_share),
+          created_at=VALUES(created_at)
       `;
 
       data.forEach((row) => {
@@ -135,7 +134,8 @@ router.post("/save-pf", (req, res) => {
             row.year,
             created_by,
             row.employee_share,
-            row.employer_share
+            row.employer_share,
+            istString  // ✅ IST time
           ],
           (err) => {
             if (err && !hasError) {
@@ -143,7 +143,6 @@ router.post("/save-pf", (req, res) => {
               console.log("ERROR:", err);
               return res.status(500).send("DB Error ❌");
             }
-
             count++;
             if (count === data.length && !hasError) {
               res.send("PF Data Saved ✅");
@@ -154,22 +153,18 @@ router.post("/save-pf", (req, res) => {
     };
 
     if (result.length > 0) {
-      // Employee exists → use existing id
       proceedWithPFInsert(result[0].id);
     } else {
-      // Employee does not exist → insert first
       const insertEmp = `
-        INSERT INTO employee_m (name, department, pf_no, created_by)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO employee_m (name, department, pf_no, created_by, created_at)
+        VALUES (?, ?, ?, ?, ?)
       `;
-      db.query(insertEmp, [empName, department, pfNo, created_by], (err, res2) => {
+      db.query(insertEmp, [empName, department, pfNo, created_by, istString], (err, res2) => {
         if (err) {
           console.log(err);
           return res.status(500).send("Error inserting employee ❌");
         }
-
-        const newEmployeeId = res2.insertId;
-        proceedWithPFInsert(newEmployeeId);
+        proceedWithPFInsert(res2.insertId);
       });
     }
   });
@@ -192,11 +187,9 @@ router.get("/get-pf-by-emp/:pfNo", (req, res) => {
       console.log(err);
       return res.status(500).send("Error fetching ❌");
     }
-
     if (result.length === 0) {
       return res.status(404).send("No data found ❌");
     }
-
     res.json(result);
   });
 });
