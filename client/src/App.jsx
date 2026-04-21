@@ -144,13 +144,15 @@ function App() {
           }
         />
 
+        {/* 🔴 REGISTER */}
+
+       <Route path="/register" element={<Register />} />
+       
         {/* 🔴 FALLBACK */}
         <Route
           path="*"
           element={<Navigate to={user ? "/" : "/login"} />}
         />
-
-        <Route path="/register" element={<Register />} />
         
       </Routes>
     </Router>
