@@ -37,19 +37,19 @@ useEffect(() => {
 }, []);
 
 
-useEffect(() => {
-  const saved = sessionStorage.getItem("pfData");
-  if (saved) {
-    const parsed = JSON.parse(saved);
-    setBasic(parsed.basic || {});
-    setDa(parsed.da || {});
-    setVpf(parsed.vpf || {});
-    setEps(parsed.eps || {});
-    setEmpName(parsed.empName || "");
-    setDepartment(parsed.department || "");
-    setPfNo(parsed.pfNo || "");
-  }
-}, []);
+// useEffect(() => {
+//   const saved = sessionStorage.getItem("pfData");
+//   if (saved) {
+//     const parsed = JSON.parse(saved);
+//     setBasic(parsed.basic || {});
+//     setDa(parsed.da || {});
+//     setVpf(parsed.vpf || {});
+//     setEps(parsed.eps || {});
+//     setEmpName(parsed.empName || "");
+//     setDepartment(parsed.department || "");
+//     setPfNo(parsed.pfNo || "");
+//   }
+// }, []);
 
   const clean = (val) => {
   if (!val || Number(val) === 0) return "";
@@ -311,13 +311,13 @@ useEffect(() => {
           className="border px-2 py-1 rounded"
           value={pfNo}
           placeholder="PF Number"
-          onChange={e => {
-            const val = e.target.value;
-            setPfNo(val);
-            if (val.length >= 5) { 
-              fetchPFData(val);
-            }
-          }}
+                onChange={e => {
+          const val = e.target.value;
+          setPfNo(val);
+          if (val.trim().length >= 5) { 
+            fetchPFData(val.trim());
+          }
+        }}
         />
           <button onClick={fetchPFData} className="bg-blue-500 text-white px-3 py-1 rounded">Fetch</button>
           <button
