@@ -124,6 +124,13 @@ function ViewData() {
     acc[r.name].push(r);
     return acc;
   }, {});
+  
+  Object.keys(grouped).forEach((name) => {
+  grouped[name].sort((a, b) => {
+    if (a.year !== b.year) return a.year - b.year;
+    return a.month_order - b.month_order;
+  });
+});
 
   if (loading) return <h2 className="text-center mt-10">Loading... ⏳</h2>;
   if (error) return <h2 className="text-center mt-10 text-red-500">{error}</h2>;
