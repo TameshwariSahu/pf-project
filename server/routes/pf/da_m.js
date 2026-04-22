@@ -25,10 +25,6 @@ router.post("/apply-da", async (req, res) => {
     const user = req.headers["x-user"] || "unknown";
     let { month, year, da_percent, category } = req.body;
 
-    if (!month || !year || !da_percent || !category) {
-      return res.status(400).send("Missing fields ❌");
-    }
-
     const now = new Date();
     const IST = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
     const istString = IST.toISOString().slice(0, 19).replace('T', ' ');
