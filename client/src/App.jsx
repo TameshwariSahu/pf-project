@@ -27,12 +27,38 @@ function App() {
           path="/login"
           element={
             !user ? (
-              <Login
-                setUser={setUser}
-                isFinance={loginType === "finance"}
-                loginType={loginType}
-                setLoginType={setLoginType}
-              />
+          
+<div className="min-h-screen flex flex-col items-center bg-gradient-to-r from-purple-400 to-blue-400 pt-2">
+                
+               <div className="mb-8 flex gap-4 justify-center mt-2">
+                  <button
+                    onClick={() => setLoginType("normal")}
+                    className={`px-6 py-2 rounded-full font-semibold ${
+                      loginType === "normal"
+                        ? "bg-white text-purple-600"
+                        : "bg-purple-200 text-gray-700"
+                    }`}
+                  >
+                    User Login
+                  </button>
+
+                  <button
+                    onClick={() => setLoginType("finance")}
+                    className={`px-6 py-2 rounded-full font-semibold ${
+                      loginType === "finance"
+                        ? "bg-white text-purple-600"
+                        : "bg-purple-200 text-gray-700"
+                    }`}
+                  >
+                    Finance Login
+                  </button>
+                </div>
+
+                <Login
+                  setUser={setUser}
+                  isFinance={loginType === "finance"}
+                />
+              </div>
             ) : (
               <Navigate to="/" />
             )
@@ -64,13 +90,16 @@ function App() {
                 <div className="flex justify-end p-4">
                   <LogoutButton setUser={setUser} />
                 </div>
+
                 {user?.role === "finance" && (
                   <div className="flex gap-3 p-4">
                     <Link to="/view" className="bg-blue-500 text-white px-4 py-2 rounded">
                       View Data
                     </Link>
+
                   </div>
                 )}
+
                 <PFStatement user={user} />
               </div>
             </RequireAuth>
@@ -110,21 +139,22 @@ function App() {
             <RequireAuth>
               <div>
                 <LogoutButton setUser={setUser} />
-                <CreateDAM year={year} financeUser={user?.userid} />
+               <CreateDAM year={year} financeUser={user?.userid} />
               </div>
             </RequireAuth>
           }
         />
 
         {/* 🔴 REGISTER */}
-        <Route path="/register" element={<Register />} />
 
+       <Route path="/register" element={<Register />} />
+       
         {/* 🔴 FALLBACK */}
         <Route
           path="*"
           element={<Navigate to={user ? "/" : "/login"} />}
         />
-
+        
       </Routes>
     </Router>
   );

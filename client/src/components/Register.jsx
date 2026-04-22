@@ -1,158 +1,80 @@
-import { useNavigate } from "react-router-dom";
-import React, { useState, useEffect } from "react";
-
+import React, { useState } from "react";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-function Login({ setUser, isFinance, loginType, setLoginType }) {
+function Register() {
   const [userid, setUserid] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  const [role, setRole] = useState("admin");
 
-  useEffect(() => {
-    sessionStorage.removeItem("pfNo");
-    sessionStorage.removeItem("empId");
-    sessionStorage.removeItem("financeUser");
-  }, []);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("userid");
-    const storedRole = localStorage.getItem("role");
-    if (storedUser && storedRole) {
-      setUser({ userid: storedUser, role: storedRole });
-    }
-  }, [setUser]);
-
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     try {
-      const url = isFinance
-        ? `${BASE_URL}/auth/finance-login`
-        : `${BASE_URL}/auth/login`;
-
-      const res = await fetch(url, {
+      const res = await fetch(`${BASE_URL}/auth/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userid, password })
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userid,
+          password,
+          role
+        })
       });
 
-      if (!res.ok) throw new Error("Server error");
-
-      const data = await res.json();
-
-      if (data.userid) {
-        localStorage.setItem("role", data.role);
-        localStorage.setItem("userid", data.userid);
-
-        if (isFinance) {
-          sessionStorage.setItem("financeUser", data.userid);
-          sessionStorage.removeItem("empId");
-        } else {
-          sessionStorage.setItem("empId", data.employeeId || "");
-          sessionStorage.removeItem("financeUser");
-        }
-
-        setUser(data);
-
-        if (data.role === "finance") {
-          navigate("/form");
-        } else {
-          navigate("/userView");
-        }
-
-      } else {
-        alert(data.message);
-      }
+      const msg = await res.text();
+      alert(msg);
 
     } catch (err) {
       console.log(err);
-      alert("Login error ❌");
+      alert("Error ❌");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 via-blue-500 to-indigo-600 px-4">
-      <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8">
+ <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-100 via-white to-purple-100 p-4">
 
-        {/* ✅ BUTTONS ANDAR */}
-        <div className="flex gap-4 justify-center mb-6">
-          <button
-            onClick={() => setLoginType("normal")}
-            className={`px-6 py-2 rounded-full font-semibold ${
-              loginType === "normal"
-                ? "bg-purple-600 text-white"
-                : "bg-purple-100 text-gray-700"
-            }`}
-          >
-            User Login
-          </button>
-          <button
-            onClick={() => setLoginType("finance")}
-            className={`px-6 py-2 rounded-full font-semibold ${
-              loginType === "finance"
-                ? "bg-purple-600 text-white"
-                : "bg-purple-100 text-gray-700"
-            }`}
-          >
-            Finance Login
-          </button>
-        </div>
+  <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md border border-gray-100">
+    
+    {/* Heading */}
+    <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">
+      Create Account
+    </h2>
 
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
-          {isFinance ? "Finance Login" : "User Login"}
-        </h2>
+    {/* UserId */}
+<input
+  placeholder="User ID"
+  value={userid}
+  onChange={(e) => setUserid(e.target.value)}
+  className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+/>
+<input
+  type="password"
+  placeholder="Password"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+  className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+/>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleLogin();
-          }}
-          className="space-y-5"
-        >
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              User ID
-            </label>
-            <input
-              type="text"
-              placeholder="Enter user ID"
-              value={userid}
-              onChange={(e) => setUserid(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none transition"
-            />
-          </div>
+    {/* Role */}
+    <select
+      value={role}
+      onChange={(e) => setRole(e.target.value)}
+      className="w-full px-4 py-2 mb-6 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+    >
+      <option value="admin">Admin</option>
+      <option value="finance">Finance</option>
+    </select>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none transition"
-            />
-          </div>
+    {/* Button */}
+    <button
+      onClick={handleRegister}
+      className="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-2 rounded-lg transition duration-200 shadow-md"
+    >
+      Register
+    </button>
 
-          <button
-            type="submit"
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg font-semibold transition duration-300"
-          >
-            Login
-          </button>
-        </form>
-
-        <div className="text-center mt-5">
-          <button
-            onClick={() => navigate("/register")}
-            className="text-blue-600 hover:underline text-sm"
-          >
-            New User? Register
-          </button>
-        </div>
-
-      </div>
-    </div>
+  </div>
+</div>
   );
 }
 
-export default Login;
+export default Register;
