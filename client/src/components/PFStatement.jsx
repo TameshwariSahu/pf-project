@@ -203,6 +203,7 @@ useEffect(() => {
 
     const data = months.map(m => ({
       month: m,
+      month_order: index + 1,
       year: getFiscalYear(m),
       basic: basic[m] ?? 0,
       da: da[m] ?? 0,
