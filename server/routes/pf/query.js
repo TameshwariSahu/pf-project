@@ -9,7 +9,7 @@ router.get("/get-pf", (req, res) => {
     SELECT pf_t.*, employee_m.name
     FROM pf_t
     JOIN employee_m ON pf_t.employee = employee_m.id
-    ORDER BY pf_t.year, pf_t.month_order
+    ORDER BY pf_t.employee, pf_t.year, pf_t.month_order
   `;
 
   db.query(sql, (err, result) => {
