@@ -128,7 +128,7 @@ function Login({ setUser, isFinance }) {
         {/* Register */}
         <div className="text-center mt-5">
           <button
-            onClick={() => (window.location.href = "/register")}
+            onClick={() => navigate("/register")}
             className="text-blue-600 hover:underline text-sm"
           >
             New User? Register
