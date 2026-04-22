@@ -29,7 +29,7 @@ function App() {
             !user ? (
               <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-400 to-blue-400">
                 
-                <div className="mb-8 flex gap-4 justify-center mt-20">
+               <div className="mb-8 flex gap-4 justify-center mt-4">
                   <button
                     onClick={() => setLoginType("normal")}
                     className={`px-6 py-2 rounded-full font-semibold ${
