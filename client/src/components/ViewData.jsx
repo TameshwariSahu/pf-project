@@ -62,26 +62,26 @@ function ViewData() {
           </tr>
         </thead>
 
-        <tbody>
-          {records.length > 0 ? (
-            records.map((r, i) => (
-              <tr key={i}>
-                <td>{r.name}</td>
-                <td>{r.month}</td>
-                <td>{r.year}</td>
-                <td>{Number(r.basic).toLocaleString()}</td>
-                <td>{Number(r.da).toLocaleString()}</td>
-                <td>{Number(r.vpf).toLocaleString()}</td>
-                <td>{Number(r.employee_share).toLocaleString()}</td>
-                <td>{Number(r.employer_share).toLocaleString()}</td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="7">No data found ❌</td>
-            </tr>
-          )}
-        </tbody>
+      <tbody>
+  {records.length > 0 ? (
+    records.map((r) => (
+      <tr key={r.id}> 
+        <td>{r.name}</td>
+        <td>{r.month}</td>
+        <td>{r.year}</td>
+        <td>{Number(r.basic).toLocaleString()}</td>
+        <td>{Number(r.da).toLocaleString()}</td>
+        <td>{Number(r.vpf).toLocaleString()}</td>
+        <td>{Number(r.employee_share).toLocaleString()}</td>
+        <td>{Number(r.employer_share).toLocaleString()}</td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="8">No data found ❌</td>
+    </tr>
+  )}
+</tbody>
       </table>
     </div>
   );

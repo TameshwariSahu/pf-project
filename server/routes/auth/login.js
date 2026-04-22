@@ -3,6 +3,10 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const db = require("../../db");
 const { getISTTime } = require('../../utils/time');
+const monthOrderMap = {
+  Apr:1, May:2, Jun:3, Jul:4, Aug:5, Sep:6,
+  Oct:7, Nov:8, Dec:9, Jan:10, Feb:11, Mar:12
+};
 
 
 // Register new user
@@ -133,36 +137,38 @@ router.post("/save-pf", (req, res) => {
     const proceedWithPFInsert = (employeeId) => {
       let count = 0;
       let hasError = false;
+      
 
-      const sql = `
-        INSERT INTO pf_t 
-        (employee, basic, da, vpf, month, year, created_by, employee_share, employer_share, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE
-          basic=VALUES(basic),
-          da=VALUES(da),
-          vpf=VALUES(vpf),
-          created_by=VALUES(created_by),
-          employee_share=VALUES(employee_share),
-          employer_share=VALUES(employer_share),
-          created_at=VALUES(created_at)
-      `;
+        const sql = `
+      INSERT INTO pf_t 
+      (employee, basic, da, vpf, month, month_order, year, created_by, employee_share, employer_share, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        basic=VALUES(basic),
+        da=VALUES(da),
+        vpf=VALUES(vpf),
+        created_by=VALUES(created_by),
+        employee_share=VALUES(employee_share),
+        employer_share=VALUES(employer_share),
+        created_at=VALUES(created_at)
+    `;
 
-      data.forEach((row) => {
-        db.query(
-          sql,
-          [
-            employeeId,
-            row.basic,
-            row.da,
-            row.vpf,
-            row.month,
-            row.year,
-            created_by,
-            row.employee_share,
-            row.employer_share,
-            istString  // ✅ IST time
-          ],
+     data.forEach((row) => {
+  db.query(
+    sql,
+    [
+      employeeId,
+      row.basic,
+      row.da,
+      row.vpf,
+      row.month,
+      monthOrderMap[row.month],  
+      row.year,
+      created_by,
+      row.employee_share,
+      row.employer_share,
+      istString
+    ],
           (err) => {
             if (err && !hasError) {
               hasError = true;
@@ -205,7 +211,7 @@ router.get("/get-pf-by-emp/:pfNo", (req, res) => {
     FROM pf_t
     JOIN employee_m ON pf_t.employee = employee_m.id
     WHERE employee_m.pf_no = ?
-    ORDER BY pf_t.id
+    ORDER BY pf_t.employee, pf_t.year, pf_t.month_order
   `;
 
   db.query(sql, [pfNo], (err, result) => {
