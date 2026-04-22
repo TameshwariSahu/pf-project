@@ -318,7 +318,16 @@ useEffect(() => {
           <button onClick={fetchPFData} className="bg-blue-500 text-white px-3 py-1 rounded">Fetch</button>
           <button
           onClick={() => {
-          navigate("/da_m");
+            if (!pfNo) {
+              alert("Enter PF Number first ❌");
+              return;
+            }
+
+            saveSessionData(); // ✅ SAVE ONCE ONLY
+
+            sessionStorage.setItem("empId", pfNo);
+
+            navigate("/da_m", { state: { employeeId: pfNo, user: localStorage.getItem("userid") } });
           }}
           className="bg-purple-600 text-white px-4 py-1 rounded"
         >

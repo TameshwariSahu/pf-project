@@ -1,146 +1,90 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 function CreateDAM() {
   const [pfData, setPfData] = useState([]);
   const [daValues, setDaValues] = useState({});
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState("Worker");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
-  const location = useLocation();
+  const user = localStorage.getItem("userid");
 
-  const employeeId =
-    location.state?.employeeId || sessionStorage.getItem("empId");
-
- const user = location.state?.user || localStorage.getItem("userid");
-console.log("USER:", user);
-  if (!employeeId) return null;
-
-  // 🔹 FETCH PF DATA (WITH CATEGORY)
-const fetchPF = async () => {
-  setLoading(true);
-  setError("");
-
-  try {
-    const res = await fetch(
-      `${BASE_URL}/da_m/get-all?employeeId=${employeeId}`
-    );
-
-    const data = await res.json();
-    setPfData([...data]); // force re-render
-
-    if (data.length > 0) {
-      setCategory(data[0].category || "Worker");
+  // 🔹 FETCH ALL MONTHS
+  const fetchPF = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`${BASE_URL}/da_m/get-all`);
+      const data = await res.json();
+      setPfData(data);
+    } catch (err) {
+      console.log(err);
+      setError("Error fetching ❌");
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.log(err);
-    setError("Error fetching ❌");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   useEffect(() => {
     fetchPF();
-  }, [employeeId]);
+  }, []);
 
-  // 🔹 CATEGORY CHANGE (AUTO UPDATE)
-  const handleCategoryChange = async (value) => {
-    setCategory(value);
+  // 🔹 DA INPUT
+  const handleDAChange = (month, year, value) => {
+    const key = `${month}-${year}`;
+    setDaValues((prev) => ({ ...prev, [key]: value }));
+  };
+
+  // 🔹 APPLY DA
+  const handleApplyDA = async (month, year) => {
+    const key = `${month}-${year}`;
+    const daPercent = daValues[key];
+
+    if (!daPercent) { alert("Enter DA % ❌"); return; }
 
     try {
-      await fetch(`${BASE_URL}/da_m/update-category`, {
+      const res = await fetch(`${BASE_URL}/da_m/apply-da`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "x-user": user
         },
         body: JSON.stringify({
-          employeeId,
-          category: value
+          month,
+          year,
+          da_percent: Number(daPercent),
+          category
         })
       });
 
+      if (!res.ok) throw new Error("Bad Request");
+      alert(`DA Applied for ALL ${category}s ✅`);
       fetchPF();
-
     } catch (err) {
       console.log(err);
-      alert("Category update error ❌");
+      alert("Server Error ❌");
     }
   };
 
-  // 🔹 DA INPUT
-  const handleDAChange = (month, year, value) => {
-    const key = `${month}-${year}`;
-    setDaValues((prev) => ({
-      ...prev,
-      [key]: value
-    }));
-  };
-
-  // 🔹 APPLY DA
-const handleApplyDA = async (month, year) => {
-  const key = `${month}-${year}`;
-  const daPercent = daValues[key];
-
-  if (!daPercent) {
-    alert("Enter DA % ❌");
-    return;
-  }
-
-  const payload = {
-    month,
-    year,
-    da_percent: Number(daPercent),
-    category: category || "Worker",
-    employeeId: employeeId
-  };
-
-  console.log("DA PAYLOAD 👉", payload);
-
-  try {
-    const res = await fetch(`${BASE_URL}/da_m/apply-da`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-user": user
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) throw new Error("Bad Request");
-
-    alert("DA Applied + Saved ✅");
-    fetchPF();
-
-  } catch (err) {
-    console.log(err);
-    alert("Server Error ❌");
-  }
-};
-
   return (
     <div className="p-5">
-
       <button
-       onClick={() => navigate("/form", { replace: true })}
+        onClick={() => navigate("/form", { replace: true })}
         className="bg-gray-500 text-white px-4 py-2 rounded mb-4"
       >
         ⬅ Back
       </button>
 
-      <h2 className="text-xl font-bold mb-4 text-center">
-        DA Management
-      </h2>
+      <h2 className="text-xl font-bold mb-4 text-center">DA Management</h2>
 
-      {/* ✅ TOP CATEGORY */}
+      {/* CATEGORY SELECT */}
       <div className="mb-4 flex justify-center">
         <select
           value={category}
-          onChange={(e) => handleCategoryChange(e.target.value)}
+          onChange={(e) => setCategory(e.target.value)}
           className="border px-4 py-2 rounded shadow"
         >
           <option value="Worker">Worker</option>
@@ -159,36 +103,24 @@ const handleApplyDA = async (month, year) => {
               <th className="border p-2">Year</th>
               <th className="border p-2">Month</th>
               <th className="border p-2">DA %</th>
-              <th className="border p-2">Category</th>
               <th className="border p-2">Action</th>
             </tr>
           </thead>
-
           <tbody>
             {pfData.map((d, i) => {
               const key = `${d.month}-${d.year}`;
-
               return (
                 <tr key={i}>
                   <td className="border p-2">{d.year}</td>
                   <td className="border p-2">{d.month}</td>
-
                   <td className="border p-2">
                     <input
                       type="number"
                       value={daValues[key] || ""}
-                      onChange={(e) =>
-                        handleDAChange(d.month, d.year, e.target.value)
-                      }
+                      onChange={(e) => handleDAChange(d.month, d.year, e.target.value)}
                       className="border px-2 py-1 w-20"
                     />
                   </td>
-
-                  {/* ✅ SHOW FROM PF DATA */}
-                  <td className="border p-2">
-                    {d.category || "Worker"}
-                  </td>
-
                   <td className="border p-2">
                     <button
                       onClick={() => handleApplyDA(d.month, d.year)}
