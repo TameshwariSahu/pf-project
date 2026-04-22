@@ -129,52 +129,50 @@ router.post("/save-pf", (req, res) => {
   const { empName, department, pfNo, created_by, data } = req.body;
 
   db.query("SELECT id FROM employee_m WHERE pf_no=?", [pfNo], (err, result) => {
-    if (err) {
-      console.log(err);
-      return res.status(500).send("Error finding employee ❌");
-    }
+    if (err) return res.status(500).send("Error finding employee ❌");
 
     const proceedWithPFInsert = (employeeId) => {
       let count = 0;
       let hasError = false;
-      
 
-        const sql = `
-      INSERT INTO pf_t 
-      (employee, basic, da, vpf, month, month_order, year, created_by, employee_share, employer_share, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      ON DUPLICATE KEY UPDATE
-        basic=VALUES(basic),
-        da=VALUES(da),
-        vpf=VALUES(vpf),
-        created_by=VALUES(created_by),
-        employee_share=VALUES(employee_share),
-        employer_share=VALUES(employer_share),
-        created_at=VALUES(created_at)
-    `;
+      const sql = `
+        INSERT INTO pf_t 
+        (employee, basic, da, vpf, month, month_order, year, created_by, employee_share, employer_share, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+          basic=VALUES(basic),
+          da=VALUES(da),
+          vpf=VALUES(vpf),
+          created_by=VALUES(created_by),
+          employee_share=VALUES(employee_share),
+          employer_share=VALUES(employer_share),
+          created_at=VALUES(created_at)
+      `;
 
-     data.forEach((row) => {
-  db.query(
-    sql,
-    [
-      employeeId,
-      row.basic,
-      row.da,
-      row.vpf,
-      row.month,
-      monthOrderMap[row.month],  
-      row.year,
-      created_by,
-      row.employee_share,
-      row.employer_share,
-      istString
-    ],
+      data.forEach((row) => {
+        const month_order = monthOrderMap[row.month]; // ✅ IMPORTANT
+
+        db.query(
+          sql,
+          [
+            employeeId,
+            row.basic,
+            row.da,
+            row.vpf,
+            row.month,
+            month_order, // ✅ yaha add karo
+            row.year,
+            created_by,
+            row.employee_share,
+            row.employer_share,
+            istString
+          ],
           (err) => {
             if (err && !hasError) {
               hasError = true;
-              console.log("ERROR:", err);
               return res.status(500).send("DB Error ❌");
             }
+
             count++;
             if (count === data.length && !hasError) {
               res.send("PF Data Saved ✅");
@@ -191,11 +189,10 @@ router.post("/save-pf", (req, res) => {
         INSERT INTO employee_m (name, department, pf_no, created_by, created_at)
         VALUES (?, ?, ?, ?, ?)
       `;
+
       db.query(insertEmp, [empName, department, pfNo, created_by, istString], (err, res2) => {
-        if (err) {
-          console.log(err);
-          return res.status(500).send("Error inserting employee ❌");
-        }
+        if (err) return res.status(500).send("Error inserting employee ❌");
+
         proceedWithPFInsert(res2.insertId);
       });
     }
