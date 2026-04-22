@@ -4,6 +4,32 @@ const bcrypt = require("bcrypt");
 const db = require("../../db");
 const { getISTTime } = require('../../utils/time');
 
+
+// Register new user
+router.post("/register", async (req, res) => {
+  const istString = getISTTime();
+  const { userid, password, role } = req.body;
+
+  if (!userid || !password || !role) {
+    return res.status(400).send("All fields required ❌");
+  }
+
+  try {
+    const hashed = await bcrypt.hash(password, 10);
+    db.query(
+      "INSERT INTO user (userid, password, role) VALUES (?, ?, ?)",
+      [userid, hashed, role],
+      (err) => {
+        if (err?.code === "ER_DUP_ENTRY") return res.send("User already exists ❌");
+        if (err) return res.status(500).send("DB Error ❌");
+        res.send("User registered ✅");
+      }
+    );
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Server error ❌");
+  }
+});
 // Create admin user
 router.get("/create-user", async (req, res) => {
   const hashed = await bcrypt.hash("1234", 10);
