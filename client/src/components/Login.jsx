@@ -75,7 +75,7 @@ function Login({ setUser, isFinance }) {
   return (
     <div className="flex items-center justify-center bg-gradient-to-br from-purple-500 via-blue-500 to-indigo-600 px-2">
       
-      <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8">
+      <div className="bg-white w-full rounded-2xl shadow-2xl p-8">
         
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
           {isFinance ? "Finance Login" : "User Login"}
