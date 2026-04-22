@@ -56,6 +56,7 @@ function ViewData() {
             <th>Year</th>
             <th>Basic</th>
             <th>DA</th>
+            <th>VPF</th>
             <th>Emp Share</th>
             <th>Employer Share</th>
           </tr>
@@ -70,6 +71,7 @@ function ViewData() {
                 <td>{r.year}</td>
                 <td>{Number(r.basic).toLocaleString()}</td>
                 <td>{Number(r.da).toLocaleString()}</td>
+                <td>{Number(r.vpf).toLocaleString()}</td>
                 <td>{Number(r.employee_share).toLocaleString()}</td>
                 <td>{Number(r.employer_share).toLocaleString()}</td>
               </tr>
