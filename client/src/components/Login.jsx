@@ -73,7 +73,7 @@ function Login({ setUser, isFinance }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 via-blue-500 to-indigo-600 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 via-blue-500 to-indigo-600 px-2">
       
       <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8">
         
