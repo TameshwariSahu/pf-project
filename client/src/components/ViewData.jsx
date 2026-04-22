@@ -161,33 +161,30 @@ function ViewData() {
           </tr>
         </thead>
         <tbody>
-          {Object.entries(grouped).length > 0 ? (
-            Object.entries(grouped).map(([name, rows]) =>
-              rows.map((r, i) => (
-                <tr key={r.id} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                  {i === 0 && (
-                    <td
-                      rowSpan={rows.length}
-                      className="font-bold border bg-blue-50 align-middle"
-                    >
-                      {name}
-                    </td>
-                  )}
-                  <td className="border p-1">{r.month}</td>
-                  <td className="border p-1">{r.year}</td>
-                  <td className="border p-1">{Number(r.basic).toLocaleString()}</td>
-                  <td className="border p-1">{Number(r.da).toLocaleString()}</td>
-                  <td className="border p-1">{Number(r.vpf).toLocaleString()}</td>
-                  <td className="border p-1">{Number(r.employee_share).toLocaleString()}</td>
-                  <td className="border p-1">{Number(r.employer_share).toLocaleString()}</td>
-                </tr>
-              ))
-            )
-          ) : (
-            <tr>
-              <td colSpan="8">No data found ❌</td>
-            </tr>
-          )}
+      {Object.entries(
+  records.reduce((acc, curr) => {
+    if (!acc[curr.name]) acc[curr.name] = [];
+    acc[curr.name].push(curr);
+    return acc;
+  }, {})
+).map(([name, rows]) => (
+  <>
+    {rows.map((r, i) => (
+      <tr key={i}>
+        {/* 👇 Name sirf first row me dikhe */}
+        {i === 0 ? <td rowSpan={rows.length}>{name}</td> : null}
+
+        <td>{r.month}</td>
+        <td>{r.year}</td>
+        <td>{Number(r.basic).toLocaleString()}</td>
+        <td>{Number(r.da).toLocaleString()}</td>
+        <td>{Number(r.vpf).toLocaleString()}</td>
+        <td>{Number(r.employee_share).toLocaleString()}</td>
+        <td>{Number(r.employer_share).toLocaleString()}</td>
+      </tr>
+    ))}
+  </>
+))}
         </tbody>
       </table>
     </div>
