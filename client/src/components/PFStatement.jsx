@@ -316,12 +316,8 @@ useEffect(() => {
         }}
         />
           <button onClick={fetchPFData} className="bg-blue-500 text-white px-3 py-1 rounded">Fetch</button>
-          <button
+          {/* <button
           onClick={() => {
-            if (!pfNo) {
-              alert("Enter PF Number first ❌");
-              return;
-            }
 
             saveSessionData(); // ✅ SAVE ONCE ONLY
 
@@ -332,7 +328,15 @@ useEffect(() => {
           className="bg-purple-600 text-white px-4 py-1 rounded"
         >
           Go to DA Page
-        </button>
+        </button> */}
+        <button
+              onClick={() => {
+                navigate("/da_m");
+              }}
+              className="bg-purple-600 text-white px-4 py-1 rounded"
+            >
+              Go to DA Page
+            </button>
         </div>
       </div>
 
