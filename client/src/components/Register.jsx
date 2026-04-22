@@ -40,18 +40,18 @@ function Register() {
     </h2>
 
     {/* UserId */}
-   <input
+<input
   placeholder="User ID"
   value={userid}
   onChange={(e) => setUserid(e.target.value)}
-  className="..."
+  className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
 />
 <input
   type="password"
   placeholder="Password"
   value={password}
   onChange={(e) => setPassword(e.target.value)}
-  className="..."
+  className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
 />
 
     {/* Role */}
