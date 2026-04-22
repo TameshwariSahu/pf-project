@@ -201,7 +201,7 @@ useEffect(() => {
     const hasData = months.some(m => Number(basic[m] ?? 0) > 0 && Number(da[m] ?? 0) > 0);
     if (!hasData) { toast.error("Enter at least one month Basic + DA ❌"); return; }
 
-    const data = months.map(m => ({
+    const data = months.map((m, index) => ({
       month: m,
       month_order: index + 1,
       year: getFiscalYear(m),
