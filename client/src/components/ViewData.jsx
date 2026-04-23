@@ -32,26 +32,29 @@ function ViewData() {
     }
   };
 
+  // ✅ pf_no se group karo — same name alag alag cards mein
   const grouped = records.reduce((acc, r) => {
-    if (!acc[r.name]) acc[r.name] = [];
-    acc[r.name].push(r);
+    const key = `${r.name}__${r.pf_no}`;
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(r);
     return acc;
   }, {});
 
-  Object.keys(grouped).forEach((name) => {
-    grouped[name].sort((a, b) => {
+  Object.keys(grouped).forEach((key) => {
+    grouped[key].sort((a, b) => {
       if (a.year !== b.year) return a.year - b.year;
       return monthOrderMap[a.month] - monthOrderMap[b.month];
     });
   });
 
-  const toggleExpand = (name) => {
-    setExpanded(prev => ({ ...prev, [name]: !prev[name] }));
+  const toggleExpand = (key) => {
+    setExpanded(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const filteredNames = Object.keys(grouped).filter(name =>
-    name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredKeys = Object.keys(grouped).filter(key => {
+    const [name] = key.split("__");
+    return name.toLowerCase().includes(search.toLowerCase());
+  });
 
   const getTotals = (rows) => ({
     basic: rows.reduce((s, r) => s + Number(r.basic || 0), 0),
@@ -83,7 +86,7 @@ function ViewData() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">PF Records</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{filteredNames.length} employee{filteredNames.length !== 1 ? "s" : ""} found</p>
+          <p className="text-sm text-gray-500 mt-0.5">{filteredKeys.length} employee{filteredKeys.length !== 1 ? "s" : ""} found</p>
         </div>
         <button
           onClick={() => navigate("/form")}
@@ -106,25 +109,28 @@ function ViewData() {
 
       {/* EMPLOYEE CARDS */}
       <div className="space-y-4">
-        {filteredNames.map((name) => {
-          const rows = grouped[name];
+        {filteredKeys.map((key) => {
+          const [name] = key.split("__");
+          const rows = grouped[key];
           const totals = getTotals(rows);
-          const isOpen = expanded[name];
+          const isOpen = expanded[key];
 
           return (
-            <div key={name} className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+            <div key={key} className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
 
               {/* CARD HEADER */}
               <div
                 className="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-gray-50 transition"
-                onClick={() => toggleExpand(name)}
+                onClick={() => toggleExpand(key)}
               >
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-gray-900 text-white flex items-center justify-center font-bold text-sm">
                     {name.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">{name}</p>
+                    <p className="font-semibold text-gray-900">
+                      {name} <span className="text-gray-400 font-normal text-sm">({rows[0]?.pf_no || "—"})</span>
+                    </p>
                     <p className="text-xs text-gray-400">{rows.length} months · Dept: {rows[0]?.department || "—"}</p>
                   </div>
                 </div>
@@ -192,7 +198,7 @@ function ViewData() {
           );
         })}
 
-        {filteredNames.length === 0 && (
+        {filteredKeys.length === 0 && (
           <div className="text-center py-16 text-gray-400">
             <p className="text-4xl mb-3">🔍</p>
             <p className="font-medium">No employees found</p>
