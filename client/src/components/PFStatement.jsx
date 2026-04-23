@@ -151,20 +151,42 @@ function PFStatement({ user = {} }) {
     <div className="min-h-screen bg-gray-50">
 
       {/* HEADER */}
-      <div className="bg-gray-900 text-white px-6 py-4">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <div>
-            <p className="text-xs text-gray-400 uppercase tracking-widest">NMDC Employees Provident Fund Trust</p>
-            <h1 className="text-lg font-bold mt-0.5">Unit : Kirandul Complex</h1>
-          </div>
-          <button
-            onClick={() => navigate("/da_m")}
-            className="bg-white text-gray-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-100 transition"
-          >
-            DA Page →
-          </button>
-        </div>
-      </div>
+ {/* HEADER */}
+<div className="bg-gray-900 text-white px-6 py-4">
+  <div className="max-w-6xl mx-auto flex justify-between items-center">
+    <div>
+      <p className="text-xs text-gray-400 uppercase tracking-widest">NMDC Employees Provident Fund Trust</p>
+      <h1 className="text-lg font-bold mt-0.5">Unit : Kirandul Complex</h1>
+    </div>
+    <div className="flex items-center gap-3">
+      {isFinance && (
+        <button
+          onClick={() => navigate("/view")}
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-600 transition"
+        >
+          View Data
+        </button>
+      )}
+      <button
+        onClick={() => navigate("/da_m")}
+        className="bg-white text-gray-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-100 transition"
+      >
+        DA Page →
+      </button>
+      <button
+        onClick={() => {
+          setUser(null);
+          localStorage.clear();
+          sessionStorage.clear();
+          navigate("/login");
+        }}
+        className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-600 transition"
+      >
+        Logout
+      </button>
+    </div>
+  </div>
+</div>
 
       <div className="max-w-6xl mx-auto px-6 py-6">
 
