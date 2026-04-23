@@ -162,7 +162,7 @@ useEffect(() => {
       toast.success("Data fetched ✅");
     } catch (err) {
       console.log(err);
-      toast.error("Error fetching ❌");
+      toast.error("NO data ❌");
     }
   };
 
