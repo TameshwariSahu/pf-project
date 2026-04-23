@@ -5,20 +5,47 @@ const cors = require("cors");
 router.use(cors());
 
 router.get("/get-pf", (req, res) => {
-  
-  const sql = `
-    SELECT pf_t.*, employee_m.name,  employee_m.pf_no
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const offset = (page - 1) * limit;
+  const search = req.query.search || "";
+
+  const searchFilter = search
+    ? `WHERE LOWER(employee_m.name) LIKE LOWER(?) OR LOWER(employee_m.pf_no) LIKE LOWER(?)`
+    : "";
+
+  const searchParams = search ? [`%${search}%`, `%${search}%`] : [];
+
+  const countSql = `
+    SELECT COUNT(DISTINCT employee_m.id) as total
     FROM pf_t
     JOIN employee_m ON pf_t.employee = employee_m.id
-    ORDER BY pf_t.employee, pf_t.year, pf_t.month_order
+    ${searchFilter}
   `;
 
-  db.query(sql, (err, result) => {
-    if (err) {
-      console.log(err);
-      return res.status(500).json([]);
-    }
-    res.json(result);
+  db.query(countSql, searchParams, (err, countResult) => {
+    if (err) return res.status(500).json([]);
+
+    const total = countResult[0].total;
+    const totalPages = Math.ceil(total / limit);
+
+    const sql = `
+      SELECT pf_t.*, employee_m.name, employee_m.pf_no
+      FROM pf_t
+      JOIN employee_m ON pf_t.employee = employee_m.id
+      WHERE pf_t.employee IN (
+        SELECT id FROM employee_m
+        ${searchFilter}
+        ORDER BY id
+        LIMIT ? OFFSET ?
+      )
+      ORDER BY pf_t.employee, pf_t.year, pf_t.month_order
+    `;
+
+    db.query(sql, [...searchParams, limit, offset], (err, result) => {
+      if (err) return res.status(500).json([]);
+      res.json({ data: result, totalPages, currentPage: page, total });
+    });
   });
 });
 
