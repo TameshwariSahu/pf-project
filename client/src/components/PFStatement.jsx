@@ -237,8 +237,8 @@ useEffect(() => {
       return;
     }
 
-    const hasData = months.some(m => Number(basic[m] ?? 0) > 0 && Number(da[m] ?? 0) > 0);
-    if (!hasData) { toast.error("Enter at least one month Basic + DA ❌"); return; }
+    const hasData = months.some(m => Number(basic[m] ?? 0) > 0);
+    if (!hasData) { toast.error("Enter at least one month Basic ❌"); return; }
 
     const data = months.map((m, index) => ({
       month: m,
