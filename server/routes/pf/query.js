@@ -51,7 +51,7 @@ router.get("/get-pf", (req, res) => {
       const placeholders = ids.map(() => "?").join(",");
 
       const sql = `
-        SELECT pf_t.*, employee_m.name, employee_m.pf_no, employee_m.department
+       SELECT pf_t.*, employee_m.name, employee_m.pf_no, employee_m.department, employee_m.category
         FROM pf_t
         JOIN employee_m ON pf_t.employee = employee_m.id
         WHERE employee_m.id IN (${placeholders})
