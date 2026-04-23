@@ -127,43 +127,83 @@ useEffect(() => {
   };
 
   // Fetch PF data
-  const fetchPFData = async (id = pfNo) => {
-    if (!id) {  return; }
-    try {
-      const res = await fetch(`${BASE_URL}/pf/get-pf-by-emp/${id}`);
-      if (!res.ok) {  return; }
-      const result = await res.json();
-
-      setEmpName(result[0].name || "");
-      setDepartment(result[0].department || "");
-
-      let newBasic = {};
-      let newDA = {};
-      let newVPF = {};
-      let newEPS = {};
-
-      result.forEach(row => {
-        newBasic[row.month] = row.basic;
-        newDA[row.month] = row.da;
-        newVPF[row.month] = row.vpf;
-        newEPS[row.month] = row.eps;
-      });
-
-      setOriginalBasic(newBasic);
-      setOriginalDA(newDA);
-      setOriginalVPF(newVPF);
-      setOriginalEPS(newEPS);
-
-      setBasic(newBasic);
-      setDa(newDA);
-      setVpf(newVPF);
-      setEps(newEPS);
-
-      toast.success("Data fetched ✅");
-    } catch (err) {
-      alert("NO data ❌");
+ const fetchPFData = async (id = pfNo) => {
+  if (!id) { return; }
+  try {
+    const res = await fetch(`${BASE_URL}/pf/get-pf-by-emp/${id}`);
+    if (!res.ok) {
+      // ✅ Reset sab
+      setEmpName("");
+      setDepartment("");
+      setBasic({});
+      setDa({});
+      setVpf({});
+      setEps({});
+      setOriginalBasic({});
+      setOriginalDA({});
+      setOriginalVPF({});
+      setOriginalEPS({});
+      toast.error("No data found ❌");
+      return;
     }
-  };
+    const result = await res.json();
+
+    if (!result || result.length === 0) {
+      // ✅ Empty array aaye tab bhi reset
+      setEmpName("");
+      setDepartment("");
+      setBasic({});
+      setDa({});
+      setVpf({});
+      setEps({});
+      setOriginalBasic({});
+      setOriginalDA({});
+      setOriginalVPF({});
+      setOriginalEPS({});
+      toast.error("No data found ❌");
+      return;
+    }
+
+    setEmpName(result[0].name || "");
+    setDepartment(result[0].department || "");
+
+    let newBasic = {};
+    let newDA = {};
+    let newVPF = {};
+    let newEPS = {};
+
+    result.forEach(row => {
+      newBasic[row.month] = row.basic;
+      newDA[row.month] = row.da;
+      newVPF[row.month] = row.vpf;
+      newEPS[row.month] = row.eps;
+    });
+
+    setOriginalBasic(newBasic);
+    setOriginalDA(newDA);
+    setOriginalVPF(newVPF);
+    setOriginalEPS(newEPS);
+    setBasic(newBasic);
+    setDa(newDA);
+    setVpf(newVPF);
+    setEps(newEPS);
+
+    toast.success("Data fetched ✅");
+  } catch (err) {
+    // ✅ Error pe bhi reset
+    setEmpName("");
+    setDepartment("");
+    setBasic({});
+    setDa({});
+    setVpf({});
+    setEps({});
+    setOriginalBasic({});
+    setOriginalDA({});
+    setOriginalVPF({});
+    setOriginalEPS({});
+    toast.error("No data found ❌");
+  }
+};
 
   const saveSessionData = () => {
   sessionStorage.setItem("pfData", JSON.stringify({
