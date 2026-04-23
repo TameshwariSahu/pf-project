@@ -5,13 +5,20 @@ const db = require("../../db");
 // 🔹 GET ALL MONTHS (category-wise, no employeeId)
 router.get("/get-all", async (req, res) => {
   try {
+    const { category } = req.query;
+
     const query = `
-      SELECT DISTINCT p.month, p.year
+      SELECT DISTINCT p.month, p.year,
+        d.da_percent
       FROM pf_t p
+      LEFT JOIN da_m d ON d.month = p.month 
+        AND d.year = p.year 
+        AND LOWER(d.category) = LOWER(?)
       ORDER BY p.year,
       FIELD(p.month,'Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar')
     `;
-    const [rows] = await db.promise().query(query);
+
+    const [rows] = await db.promise().query(query, [category]);
     res.json(rows);
   } catch (err) {
     console.log(err);

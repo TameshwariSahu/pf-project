@@ -14,23 +14,32 @@ function CreateDAM() {
 
   // 🔹 FETCH ALL MONTHS
   const fetchPF = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const res = await fetch(`${BASE_URL}/da_m/get-all`);
-      const data = await res.json();
-      setPfData(data);
-    } catch (err) {
-      console.log(err);
-      setError("Error fetching ❌");
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  setError("");
+  try {
+    const res = await fetch(`${BASE_URL}/da_m/get-all?category=${category}`);
+    const data = await res.json();
+    setPfData(data);
+
+    const prefilled = {};
+    data.forEach(d => {
+      if (d.da_percent) {
+        prefilled[`${d.month}-${d.year}`] = d.da_percent;
+      }
+    });
+    setDaValues(prefilled);
+
+  } catch (err) {
+    console.log(err);
+    setError("Error fetching ❌");
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchPF();
-  }, []);
+  }, [category]);
 
   // 🔹 DA INPUT
   const handleDAChange = (month, year, value) => {
