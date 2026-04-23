@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { BrowserRouter as Router, Routes, Route, Navigate, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import PFStatement from "./components/PFStatement";
 import Login from "./components/Login";
 import ViewData from "./components/ViewData";
@@ -22,42 +21,27 @@ function App() {
     <Router>
       <Routes>
 
-        {/* 🔴 LOGIN PAGE */}
+        {/* LOGIN */}
         <Route
           path="/login"
           element={
             !user ? (
-          
-<div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-400 to-blue-400">
-                
-              <div className="flex gap-4 mb-4">
+              <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-400 to-blue-400">
+                <div className="flex gap-4 mb-4">
                   <button
                     onClick={() => setLoginType("normal")}
-                    className={`px-6 py-2 rounded-full font-semibold ${
-                      loginType === "normal"
-                        ? "bg-white text-purple-600"
-                        : "bg-purple-200 text-gray-700"
-                    }`}
+                    className={`px-6 py-2 rounded-full font-semibold ${loginType === "normal" ? "bg-white text-purple-600" : "bg-purple-200 text-gray-700"}`}
                   >
                     User Login
                   </button>
-
                   <button
                     onClick={() => setLoginType("finance")}
-                    className={`px-6 py-2 rounded-full font-semibold ${
-                      loginType === "finance"
-                        ? "bg-white text-purple-600"
-                        : "bg-purple-200 text-gray-700"
-                    }`}
+                    className={`px-6 py-2 rounded-full font-semibold ${loginType === "finance" ? "bg-white text-purple-600" : "bg-purple-200 text-gray-700"}`}
                   >
                     Finance Login
                   </button>
                 </div>
-
-                <Login
-                  setUser={setUser}
-                  isFinance={loginType === "finance"}
-                />
+                <Login setUser={setUser} isFinance={loginType === "finance"} />
               </div>
             ) : (
               <Navigate to="/" />
@@ -65,49 +49,29 @@ function App() {
           }
         />
 
-        {/* 🔴 HOME REDIRECT */}
+        {/* HOME REDIRECT */}
         <Route
           path="/"
           element={
             user ? (
-              user.role === "finance" ? (
-                <Navigate to="/form" />
-              ) : (
-                <Navigate to="/userView" />
-              )
+              user.role === "finance" ? <Navigate to="/form" /> : <Navigate to="/userView" />
             ) : (
               <Navigate to="/login" />
             )
           }
         />
 
-        {/* 🔴 PF FORM */}
+        {/* PF FORM */}
         <Route
           path="/form"
           element={
             <RequireAuth>
-               <PFStatement user={user} setUser={setUser} />
-              <div>
-                <div className="flex justify-end p-4">
-                  <LogoutButton setUser={setUser} />
-                </div>
-
-                {user?.role === "finance" && (
-                  <div className="flex gap-3 p-4">
-                    <Link to="/view" className="bg-blue-500 text-white px-4 py-2 rounded">
-                      View Data
-                    </Link>
-
-                  </div>
-                )}
-
-                <PFStatement user={user} />
-              </div>
+              <PFStatement user={user} setUser={setUser} />
             </RequireAuth>
           }
         />
 
-        {/* 🔴 VIEW DATA */}
+        {/* VIEW DATA */}
         <Route
           path="/view"
           element={
@@ -120,7 +84,7 @@ function App() {
           }
         />
 
-        {/* 🔴 USER VIEW */}
+        {/* USER VIEW */}
         <Route
           path="/userView"
           element={
@@ -133,29 +97,25 @@ function App() {
           }
         />
 
-        {/* 🔴 CREATE DA */}
+        {/* DA PAGE */}
         <Route
           path="/da_m"
           element={
             <RequireAuth>
               <div>
                 <LogoutButton setUser={setUser} />
-               <CreateDAM year={year} financeUser={user?.userid} />
+                <CreateDAM year={year} financeUser={user?.userid} />
               </div>
             </RequireAuth>
           }
         />
 
-        {/* 🔴 REGISTER */}
+        {/* REGISTER */}
+        <Route path="/register" element={<Register />} />
 
-       <Route path="/register" element={<Register />} />
-       
-        {/* 🔴 FALLBACK */}
-        <Route
-          path="*"
-          element={<Navigate to={user ? "/" : "/login"} />}
-        />
-        
+        {/* FALLBACK */}
+        <Route path="*" element={<Navigate to={user ? "/" : "/login"} />} />
+
       </Routes>
     </Router>
   );
