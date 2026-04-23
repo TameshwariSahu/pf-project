@@ -52,6 +52,9 @@ app.use("/employee", employeeRoutes);
 const da_mRouter = require("./routes/pf/da_m");
 app.use("/da_m", da_mRouter);
 
+const pfCategoryRoutes = require("./routes/pf/update-category");
+app.use("/pf", pfCategoryRoutes);
+
 // test
 app.get("/", (req, res) => {
   res.send("Backend working ✅");

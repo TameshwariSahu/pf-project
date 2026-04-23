@@ -7,7 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-function PFStatement({ user = {} }) {
+function PFStatement({ user = {}, setUser }) {
   const months = ["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"];
   const years = [];
   for (let i = 2008; i <= 2015; i++) years.push(i);

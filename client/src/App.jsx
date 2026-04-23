@@ -86,6 +86,7 @@ function App() {
           path="/form"
           element={
             <RequireAuth>
+               <PFStatement user={user} setUser={setUser} />
               <div>
                 <div className="flex justify-end p-4">
                   <LogoutButton setUser={setUser} />
