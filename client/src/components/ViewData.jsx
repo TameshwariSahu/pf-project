@@ -12,11 +12,11 @@ function ViewData() {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [expanded, setExpanded] = useState({});
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
     try {
@@ -45,53 +45,160 @@ function ViewData() {
     });
   });
 
-  if (loading) return <h2 className="text-center mt-10">Loading... ⏳</h2>;
-  if (error) return <h2 className="text-center mt-10 text-red-500">{error}</h2>;
+  const toggleExpand = (name) => {
+    setExpanded(prev => ({ ...prev, [name]: !prev[name] }));
+  };
+
+  const filteredNames = Object.keys(grouped).filter(name =>
+    name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const getTotals = (rows) => ({
+    basic: rows.reduce((s, r) => s + Number(r.basic || 0), 0),
+    da: rows.reduce((s, r) => s + Number(r.da || 0), 0),
+    vpf: rows.reduce((s, r) => s + Number(r.vpf || 0), 0),
+    emp: rows.reduce((s, r) => s + Number(r.employee_share || 0), 0),
+    employer: rows.reduce((s, r) => s + Number(r.employer_share || 0), 0),
+  });
+
+  if (loading) return (
+    <div className="flex items-center justify-center h-screen">
+      <div className="text-center">
+        <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+        <p className="text-gray-600 font-medium">Loading records...</p>
+      </div>
+    </div>
+  );
+
+  if (error) return (
+    <div className="flex items-center justify-center h-screen">
+      <p className="text-red-500 font-semibold">{error}</p>
+    </div>
+  );
 
   return (
-    <div className="p-5">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">PF Records</h2>
+    <div className="min-h-screen bg-gray-50 p-6">
+
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">PF Records</h1>
+          <p className="text-sm text-gray-500 mt-0.5">{filteredNames.length} employee{filteredNames.length !== 1 ? "s" : ""} found</p>
+        </div>
         <button
           onClick={() => navigate("/form")}
-          className="bg-gray-800 text-white px-4 py-1 rounded hover:bg-gray-700"
+          className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-700 transition"
         >
           ⬅ Back
         </button>
       </div>
 
-      <table className="border w-full text-center text-sm">
-        <thead className="bg-black text-white">
-          <tr>
-            <th className="p-2 border">Name</th>
-            <th className="p-2 border">Month</th>
-            <th className="p-2 border">Year</th>
-            <th className="p-2 border">Basic</th>
-            <th className="p-2 border">DA</th>
-            <th className="p-2 border">VPF</th>
-            <th className="p-2 border">Emp Share</th>
-            <th className="p-2 border">Employer Share</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.entries(grouped).map(([name, rows]) => (
-            <>
-              {rows.map((r, i) => (
-                <tr key={r.id}>
-                  {i === 0 ? <td rowSpan={rows.length} className="font-bold border bg-blue-50 align-middle">{name}</td> : null}
-                  <td className="border p-1">{r.month}</td>
-                  <td className="border p-1">{r.year}</td>
-                  <td className="border p-1">{Number(r.basic).toLocaleString()}</td>
-                  <td className="border p-1">{Number(r.da).toLocaleString()}</td>
-                  <td className="border p-1">{Number(r.vpf).toLocaleString()}</td>
-                  <td className="border p-1">{Number(r.employee_share).toLocaleString()}</td>
-                  <td className="border p-1">{Number(r.employer_share).toLocaleString()}</td>
-                </tr>
-              ))}
-            </>
-          ))}
-        </tbody>
-      </table>
+      {/* SEARCH */}
+      <div className="mb-5">
+        <input
+          type="text"
+          placeholder="🔍  Search employee..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="w-full max-w-sm border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+        />
+      </div>
+
+      {/* EMPLOYEE CARDS */}
+      <div className="space-y-4">
+        {filteredNames.map((name) => {
+          const rows = grouped[name];
+          const totals = getTotals(rows);
+          const isOpen = expanded[name];
+
+          return (
+            <div key={name} className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+
+              {/* CARD HEADER */}
+              <div
+                className="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-gray-50 transition"
+                onClick={() => toggleExpand(name)}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-gray-900 text-white flex items-center justify-center font-bold text-sm">
+                    {name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">{name}</p>
+                    <p className="text-xs text-gray-400">{rows.length} months · Dept: {rows[0]?.department || "—"}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-6">
+                  <div className="hidden sm:flex gap-6 text-xs text-gray-500">
+                    <div className="text-right">
+                      <p className="text-gray-400">Total Basic</p>
+                      <p className="font-semibold text-gray-800">{totals.basic.toLocaleString()}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-gray-400">Total DA</p>
+                      <p className="font-semibold text-gray-800">{totals.da.toLocaleString()}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-gray-400">Emp Share</p>
+                      <p className="font-semibold text-gray-800">{totals.emp.toLocaleString()}</p>
+                    </div>
+                  </div>
+                  <span className="text-gray-400 text-lg">{isOpen ? "▲" : "▼"}</span>
+                </div>
+              </div>
+
+              {/* EXPANDABLE TABLE */}
+              {isOpen && (
+                <div className="overflow-x-auto border-t border-gray-100">
+                  <table className="w-full text-sm text-center">
+                    <thead className="bg-gray-900 text-white">
+                      <tr>
+                        <th className="px-3 py-2">Month</th>
+                        <th className="px-3 py-2">Year</th>
+                        <th className="px-3 py-2">Basic</th>
+                        <th className="px-3 py-2">DA</th>
+                        <th className="px-3 py-2">VPF</th>
+                        <th className="px-3 py-2">Emp Share</th>
+                        <th className="px-3 py-2">Employer Share</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.map((r, i) => (
+                        <tr key={r.id} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                          <td className="px-3 py-2 font-medium">{r.month}</td>
+                          <td className="px-3 py-2 text-gray-500">{r.year}</td>
+                          <td className="px-3 py-2">{Number(r.basic).toLocaleString()}</td>
+                          <td className="px-3 py-2">{Number(r.da).toLocaleString()}</td>
+                          <td className="px-3 py-2">{Number(r.vpf).toLocaleString()}</td>
+                          <td className="px-3 py-2">{Number(r.employee_share).toLocaleString()}</td>
+                          <td className="px-3 py-2">{Number(r.employer_share).toLocaleString()}</td>
+                        </tr>
+                      ))}
+                      {/* TOTALS ROW */}
+                      <tr className="bg-blue-50 font-bold text-gray-800 border-t border-blue-200">
+                        <td className="px-3 py-2" colSpan={2}>Total</td>
+                        <td className="px-3 py-2">{totals.basic.toLocaleString()}</td>
+                        <td className="px-3 py-2">{totals.da.toLocaleString()}</td>
+                        <td className="px-3 py-2">{totals.vpf.toLocaleString()}</td>
+                        <td className="px-3 py-2">{totals.emp.toLocaleString()}</td>
+                        <td className="px-3 py-2">{totals.employer.toLocaleString()}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        {filteredNames.length === 0 && (
+          <div className="text-center py-16 text-gray-400">
+            <p className="text-4xl mb-3">🔍</p>
+            <p className="font-medium">No employees found</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
