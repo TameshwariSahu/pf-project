@@ -161,7 +161,6 @@ useEffect(() => {
 
       toast.success("Data fetched ✅");
     } catch (err) {
-      console.log(err);
       alert("NO data ❌");
     }
   };
