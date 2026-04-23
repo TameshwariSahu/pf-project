@@ -175,7 +175,21 @@ router.post("/save-pf", (req, res) => {
 
             count++;
             if (count === data.length && !hasError) {
-              res.send("PF Data Saved ✅");
+              
+               const applyCurrentDA = `
+                UPDATE pf_t p
+                JOIN employee_m e ON p.employee = e.id
+                JOIN da_m d ON d.month = p.month 
+                  AND d.year = p.year 
+                  AND LOWER(d.category) = LOWER(e.category)
+                SET p.da = ROUND((p.basic * d.da_percent) / 100)
+                WHERE e.id = ?
+              `;
+
+              db.query(applyCurrentDA, [employeeId], (err) => {
+                if (err) console.log("DA apply error:", err);
+                res.send("PF Data Saved ✅");
+              });
             }
           }
         );
