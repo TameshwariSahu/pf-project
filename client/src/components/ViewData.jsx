@@ -19,10 +19,12 @@ function ViewData() {
   useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
+    
     try {
       const res = await fetch(`${BASE_URL}/pf/get-pf`);
       if (!res.ok) throw new Error("Server error");
       const data = await res.json();
+      console.log("DATA:", data[0]); 
       setRecords(data);
     } catch (err) {
       console.log(err);
