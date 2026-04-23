@@ -28,26 +28,46 @@ router.get("/get-pf", (req, res) => {
     const total = countResult[0].total;
     const totalPages = Math.ceil(total / limit) || 1;
 
-    // ✅ Subquery hatao — seedha JOIN mein filter karo
-    const sql = `
-      SELECT pf_t.*, employee_m.name, employee_m.pf_no, employee_m.department
-      FROM pf_t
-      JOIN employee_m ON pf_t.employee = employee_m.id
+    const empSql = `
+      SELECT DISTINCT employee_m.id
+      FROM employee_m
+      JOIN pf_t ON pf_t.employee = employee_m.id
       ${search ? "WHERE LOWER(employee_m.name) LIKE LOWER(?) OR LOWER(employee_m.pf_no) LIKE LOWER(?)" : ""}
-      ORDER BY employee_m.id, pf_t.year, pf_t.month_order
+      ORDER BY employee_m.id
       LIMIT ? OFFSET ?
     `;
 
-    db.query(sql, [...searchParams, limit, offset], (err, result) => {
+    db.query(empSql, [...searchParams, limit, offset], (err, empResult) => {
       if (err) {
-        console.log("QUERY ERROR:", err);
+        console.log("EMP ERROR:", err);
         return res.status(500).json({ error: err.message });
       }
-      res.json({ data: result, totalPages, currentPage: page, total });
+
+      if (empResult.length === 0) {
+        return res.json({ data: [], totalPages, currentPage: page, total });
+      }
+
+      const ids = empResult.map(e => e.id);
+      const placeholders = ids.map(() => "?").join(",");
+
+      const sql = `
+        SELECT pf_t.*, employee_m.name, employee_m.pf_no, employee_m.department
+        FROM pf_t
+        JOIN employee_m ON pf_t.employee = employee_m.id
+        WHERE employee_m.id IN (${placeholders})
+        ORDER BY employee_m.id, pf_t.year, pf_t.month_order
+      `;
+
+      db.query(sql, ids, (err, result) => {
+        if (err) {
+          console.log("QUERY ERROR:", err);
+          return res.status(500).json({ error: err.message });
+        }
+        res.json({ data: result, totalPages, currentPage: page, total });
+      });
     });
   });
 });
-
 router.get("/get-pf-by-emp/:pfNo", (req, res) => {
   const pfNo = req.params.pfNo;
 
