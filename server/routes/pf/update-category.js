@@ -1,3 +1,7 @@
+const express = require("express");
+const router = express.Router();
+const db = require("../../db");
+
 router.post("/update-category", (req, res) => {
   const { employeeId, category } = req.body;
   db.query(
@@ -9,3 +13,5 @@ router.post("/update-category", (req, res) => {
     }
   );
 });
+
+module.exports = router;
