@@ -149,7 +149,26 @@ function ViewData() {
                             {name} <span className="text-gray-400 font-normal text-sm">({rows[0]?.pf_no || "—"})</span>
                           </p>
                           <p className="text-xs text-gray-400">{rows.length} months · Dept: {rows[0]?.department || "—"}</p>
-                        </div>
+
+                          <select
+                          value={rows[0]?.category || "Worker"}
+                          onChange={async (e) => {
+                            const res = await fetch(`${BASE_URL}/pf/update-category`, {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ 
+                                employeeId: rows[0]?.employee, 
+                                category: e.target.value 
+                              })
+                            });
+                            if (res.ok) fetchData(currentPage, search);
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-xs border border-gray-300 rounded px-2 py-0.5 mt-1 focus:outline-none focus:ring-1 focus:ring-gray-900">
+                          <option value="Worker">Worker</option>
+                          <option value="Executive">Executive</option>
+                        </select>
+                      </div>
                       </div>
 
                       <div className="flex items-center gap-6">
