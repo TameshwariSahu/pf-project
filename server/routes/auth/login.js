@@ -12,7 +12,7 @@ const monthOrderMap = {
 // Register new user
 router.post("/register", async (req, res) => {
   const istString = getISTTime();
-  const { userid, password, role } = req.body;
+  const { userid, password, role, created_by } = req.body; // ✅ created_by add
 
   if (!userid || !password || !role) {
     return res.status(400).send("All fields required ❌");
@@ -21,8 +21,8 @@ router.post("/register", async (req, res) => {
   try {
     const hashed = await bcrypt.hash(password, 10);
     db.query(
-      "INSERT INTO user (userid, password, role) VALUES (?, ?, ?)",
-      [userid, hashed, role],
+      "INSERT INTO user (userid, password, role, created_by, created_at) VALUES (?, ?, ?, ?, ?)", // ✅
+      [userid, hashed, role, created_by, istString], // ✅
       (err) => {
         if (err?.code === "ER_DUP_ENTRY") return res.send("User already exists ❌");
         if (err) return res.status(500).send("DB Error ❌");
@@ -30,7 +30,6 @@ router.post("/register", async (req, res) => {
       }
     );
   } catch (err) {
-    console.log(err);
     res.status(500).send("Server error ❌");
   }
 });

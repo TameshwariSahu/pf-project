@@ -26,6 +26,7 @@ function PFStatement({ user = {}, setUser }) {
   const [originalDA, setOriginalDA] = useState({});
   const [originalVPF, setOriginalVPF] = useState({});
   const [originalEPS, setOriginalEPS] = useState({});
+  const [category, setCategory] = useState("Worker");
 
   const navigate = useNavigate();
 
@@ -45,8 +46,8 @@ function PFStatement({ user = {}, setUser }) {
       setEps(parsed.eps || {});
       setEmpName(parsed.empName || "");
       setDepartment(parsed.department || "");
-      if (result[0].year) setYear(result[0].year);
       setPfNo(parsed.pfNo || "");
+      if (parsed.year) setYear(parsed.year);
     }
   }, []);
 
@@ -86,7 +87,7 @@ function PFStatement({ user = {}, setUser }) {
       }
       setEmpName(result[0].name || "");
       setDepartment(result[0].department || "");
-       if (result[0].year) setYear(result[0].year);
+      if (result[0].year) setYear(result[0].year);
       let nb = {}, nd = {}, nv = {}, ne = {};
       result.forEach(row => { nb[row.month] = row.basic; nd[row.month] = row.da; nv[row.month] = row.vpf; ne[row.month] = row.eps; });
       setOriginalBasic(nb); setOriginalDA(nd); setOriginalVPF(nv); setOriginalEPS(ne);
@@ -101,7 +102,7 @@ function PFStatement({ user = {}, setUser }) {
   };
 
   const saveSessionData = () => {
-    sessionStorage.setItem("pfData", JSON.stringify({ basic, da, vpf, eps, empName, department, pfNo }));
+    sessionStorage.setItem("pfData", JSON.stringify({ basic, da, vpf, eps, empName, department, pfNo, year }));
   };
 
   const saveToDB = async () => {
@@ -117,7 +118,12 @@ function PFStatement({ user = {}, setUser }) {
       const res = await fetch(`${BASE_URL}/auth/save-pf`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ empName, department, pfNo, created_by: user?.userid, data })
+        body: JSON.stringify({ 
+          empName, department, pfNo, 
+          created_by: user?.userid, 
+          category, // 
+          data 
+        })
       });
       const msg = await res.text();
       toast.success(msg);
@@ -153,49 +159,34 @@ function PFStatement({ user = {}, setUser }) {
     <div className="min-h-screen bg-gray-50">
 
       {/* HEADER */}
- {/* HEADER */}
-<div className="bg-gray-900 text-white px-6 py-4">
-  <div className="max-w-6xl mx-auto flex justify-between items-center">
-    <div>
-      <p className="text-xs text-gray-400 uppercase tracking-widest">NMDC Employees Provident Fund Trust</p>
-      <h1 className="text-lg font-bold mt-0.5">Unit : Kirandul Complex</h1>
-    </div>
-    <div className="flex items-center gap-3">
-      {isFinance && (
-        <button
-          onClick={() => navigate("/view")}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-600 transition"
-        >
-          View Data
-        </button>
-      )}
-      <button
-        onClick={() => navigate("/da_m")}
-        className="bg-white text-gray-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-100 transition"
-      >
-        DA Page →
-      </button>
-     <button
-          onClick={() => navigate("/register")}
-          className="flex items-center gap-2 bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-700 active:scale-95 transition-all duration-150"
-        >
-          <span className="text-base leading-none">+</span>
-          New Register
-        </button>
-      <button
-        onClick={() => {
-          setUser(null);
-          localStorage.clear();
-          sessionStorage.clear();
-          navigate("/login");
-        }}
-        className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-600 transition"
-      >
-        Logout
-      </button>
-    </div>
-  </div>
-</div>
+      <div className="bg-gray-900 text-white px-6 py-4">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <div>
+            <p className="text-xs text-gray-400 uppercase tracking-widest">NMDC Employees Provident Fund Trust</p>
+            <h1 className="text-lg font-bold mt-0.5">Unit : Kirandul Complex</h1>
+          </div>
+          <div className="flex items-center gap-3">
+            {isFinance && (
+              <button onClick={() => navigate("/view")} className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-600 transition">
+                View Data
+              </button>
+            )}
+            <button onClick={() => navigate("/da_m")} className="bg-white text-gray-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-100 transition">
+              DA Page →
+            </button>
+            <button onClick={() => navigate("/register")} className="flex items-center gap-2 bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-700 active:scale-95 transition-all duration-150">
+              <span className="text-base leading-none">+</span>
+              New Register
+            </button>
+            <button
+              onClick={() => { setUser(null); localStorage.clear(); sessionStorage.clear(); navigate("/login"); }}
+              className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-600 transition"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
 
       <div className="max-w-6xl mx-auto px-6 py-6">
 
@@ -224,8 +215,7 @@ function PFStatement({ user = {}, setUser }) {
               <label className="text-xs text-gray-500 mb-1 block">Employee Name</label>
               <input
                 className="w-full border border-gray-300 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
-                value={empName}
-                placeholder="Enter name"
+                value={empName} placeholder="Enter name"
                 onChange={e => setEmpName(e.target.value)}
               />
             </div>
@@ -233,8 +223,7 @@ function PFStatement({ user = {}, setUser }) {
               <label className="text-xs text-gray-500 mb-1 block">Department</label>
               <input
                 className="w-full border border-gray-300 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
-                value={department}
-                placeholder="Enter department"
+                value={department} placeholder="Enter department"
                 onChange={e => setDepartment(e.target.value)}
               />
             </div>
@@ -243,18 +232,28 @@ function PFStatement({ user = {}, setUser }) {
               <div className="flex gap-2">
                 <input
                   className="w-full border border-gray-300 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
-                  value={pfNo}
-                  placeholder="Enter PF No."
+                  value={pfNo} placeholder="Enter PF No."
                   onChange={e => setPfNo(e.target.value)}
                 />
-                <button
-                  onClick={() => fetchPFData()}
-                  className="bg-gray-900 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-700 transition whitespace-nowrap"
-                >
+                <button onClick={() => fetchPFData()} className="bg-gray-900 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-700 transition whitespace-nowrap">
                   Fetch
                 </button>
               </div>
             </div>
+
+            {/* CATEGORY */}
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Category</label>
+              <select
+                value={category}
+                onChange={e => setCategory(e.target.value)}
+                className="w-full border border-gray-300 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+              >
+                <option value="Worker">Worker</option>
+                <option value="Executive">Executive</option>
+              </select>
+            </div>
+
           </div>
         </div>
 
@@ -280,8 +279,7 @@ function PFStatement({ user = {}, setUser }) {
                     <td className="px-3 py-2 font-medium text-gray-700">{m}</td>
                     <td className="px-3 py-2">
                       <input
-                        type="number"
-                        value={basic[m] ?? ""}
+                        type="number" value={basic[m] ?? ""}
                         onChange={e => setBasic({ ...basic, [m]: Number(e.target.value) })}
                         className="w-24 border border-gray-200 rounded px-2 py-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-gray-900"
                       />
@@ -290,8 +288,7 @@ function PFStatement({ user = {}, setUser }) {
                     <td className="px-3 py-2 font-medium">{basicDA(m) || ""}</td>
                     <td className="px-3 py-2">
                       <input
-                        type="number"
-                        value={vpf[m] ?? ""}
+                        type="number" value={vpf[m] ?? ""}
                         onChange={e => setVpf({ ...vpf, [m]: safeNum(e.target.value) })}
                         className="w-20 border border-gray-200 rounded px-2 py-1 text-center text-sm focus:outline-none focus:ring-1 focus:ring-gray-900"
                       />
@@ -301,7 +298,6 @@ function PFStatement({ user = {}, setUser }) {
                     <td className="px-3 py-2">{employerShare(m) || ""}</td>
                   </tr>
                 ))}
-                {/* TOTAL ROW */}
                 <tr className="bg-blue-50 font-bold text-gray-800 border-t-2 border-blue-200">
                   <td className="px-3 py-3">Total</td>
                   <td className="px-3 py-3">{clean(totalBasic)}</td>
@@ -320,23 +316,16 @@ function PFStatement({ user = {}, setUser }) {
         {/* ACTION BUTTONS */}
         <div className="flex gap-3 justify-end">
           {isFinance && (
-            <button
-              onClick={saveToDB}
-              className="bg-green-600 text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-green-700 transition"
-            >
+            <button onClick={saveToDB} className="bg-green-600 text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-green-700 transition">
               Save
             </button>
           )}
-          <button
-            onClick={downloadPDF}
-            className="bg-gray-900 text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-700 transition"
-          >
+          <button onClick={downloadPDF} className="bg-gray-900 text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-700 transition">
             Download PDF
           </button>
         </div>
 
       </div>
-
       <ToastContainer />
     </div>
   );

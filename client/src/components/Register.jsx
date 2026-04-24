@@ -9,17 +9,14 @@ function Register() {
   const navigate = useNavigate();
 
   const handleRegister = async () => {
+    const created_by = localStorage.getItem("userid");
     try {
       const res = await fetch(`${BASE_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          userid,
-          password,
-          role
-        })
+       body: JSON.stringify({ userid, password, role, created_by })
       });
 
       const msg = await res.text();
