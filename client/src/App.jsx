@@ -22,18 +22,16 @@ function App() {
       <Routes>
 
         {/* LOGIN */}
-        <Route
-          path="/login"
-          element={
-            !user ? (
-              <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+              <Route
+            path="/login"
+            element={
+              !user ? (
                 <Login setUser={setUser} isFinance={loginType === "finance"} setLoginType={setLoginType} loginType={loginType} />
-              </div>
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
 
         {/* HOME REDIRECT */}
         <Route
