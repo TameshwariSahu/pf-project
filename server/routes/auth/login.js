@@ -47,11 +47,13 @@ router.get("/create-user", async (req, res) => {
 // Create finance user
 router.get("/create-finance-user", async (req, res) => {
   const hashed = await bcrypt.hash("1234", 10);
-  db.query("INSERT INTO user (userid,password,role) VALUES (?,?,?)", ["finance", hashed, "finance"], (err) => {
-    if (err?.code === "ER_DUP_ENTRY") return res.send("Finance exists ✅");
-    if (err) return res.send(err);
-    res.send("Finance created ✅");
-  });
+  db.query("INSERT INTO user (userid,password,role) VALUES (?,?,?)", 
+    ["finance", hashed, "admin"],  // ✅ "finance" → "admin"
+    (err) => {
+      if (err?.code === "ER_DUP_ENTRY") return res.send("Finance exists ✅");
+      if (err) return res.send(err);
+      res.send("Finance created ✅");
+    });
 });
 
 // admin login
@@ -63,7 +65,7 @@ router.post("/login", (req, res) => {
     const user = result[0];
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.json({ message: "Wrong password ❌" });
-    if (user.role === "finance") return res.json({ message: "Use Finance Login ❌" });
+    if (user.role === "admin") return res.json({ message: "Use Finance Login ❌" }); // ✅
     res.json({ userid: user.userid, role: user.role, message: "Login ✅" });
   });
 });
@@ -119,7 +121,7 @@ router.post("/finance-login", (req, res) => {
     const user = result[0];
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.json({ message: "Wrong password ❌" });
-    if (user.role !== "finance") return res.json({ message: "Use Normal Login ❌" });
+    if (user.role !== "admin") return res.json({ message: "Use Normal Login ❌" }); // ✅
     res.json({ userid: user.userid, role: user.role, message: "Login ✅" });
   });
 });
