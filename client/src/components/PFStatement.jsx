@@ -173,12 +173,13 @@ function PFStatement({ user = {}, setUser }) {
       >
         DA Page →
       </button>
-      <button
-        onClick={() => navigate("/register")}
-        className="bg-blue text-white-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-100 transition"
-      >
-        New Register
-      </button>
+     <button
+          onClick={() => navigate("/register")}
+          className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-700 active:scale-95 transition-all duration-150"
+        >
+          <span className="text-base leading-none">+</span>
+          New Register
+        </button>
       <button
         onClick={() => {
           setUser(null);

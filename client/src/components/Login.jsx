@@ -124,17 +124,6 @@ function Login({ setUser, isFinance }) {
             Login
           </button>
         </form>
-
-        {/* Register */}
-        <div className="text-center mt-5">
-          <button
-            onClick={() => navigate("/register")}
-            className="text-blue-600 hover:underline text-sm"
-          >
-            New User? Register
-          </button>
-        </div>
-
       </div>
     </div>
   );
