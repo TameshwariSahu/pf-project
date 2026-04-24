@@ -6,6 +6,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 function Login({ setUser, isFinance, setLoginType, loginType }) {
   const [userid, setUserid] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,6 +24,7 @@ function Login({ setUser, isFinance, setLoginType, loginType }) {
   }, [setUser]);
 
   const handleLogin = async () => {
+    setLoading(true);
     try {
       const url = isFinance
         ? `${BASE_URL}/auth/finance-login`
@@ -56,8 +58,9 @@ function Login({ setUser, isFinance, setLoginType, loginType }) {
         alert(data.message);
       }
     } catch (err) {
-      console.log(err);
       alert("Login error ❌");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -107,7 +110,7 @@ function Login({ setUser, isFinance, setLoginType, loginType }) {
               </button>
             </div>
 
-            {/* ✅ Form wrap */}
+            {/* Form */}
             <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
               <div className="mb-3">
                 <label className="text-xs text-gray-500 mb-1 block">User ID</label>
@@ -115,6 +118,7 @@ function Login({ setUser, isFinance, setLoginType, loginType }) {
                   type="text"
                   placeholder="Enter user ID"
                   value={userid}
+                  autoComplete="off"
                   onChange={(e) => setUserid(e.target.value)}
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900"
                 />
@@ -125,16 +129,17 @@ function Login({ setUser, isFinance, setLoginType, loginType }) {
                   type="password"
                   placeholder="Enter password"
                   value={password}
-                   autoComplete="off"
+                  autoComplete="off"
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900"
                 />
               </div>
               <button
                 type="submit"
-                className="w-full bg-gray-900 text-white rounded-lg py-2 text-xs font-semibold hover:bg-gray-700 transition active:scale-95"
+                disabled={loading}
+                className="w-full bg-gray-900 text-white rounded-lg py-2 text-xs font-semibold hover:bg-gray-700 transition active:scale-95 disabled:opacity-60"
               >
-                Login
+                {loading ? "Logging in..." : "Login"}
               </button>
             </form>
 
