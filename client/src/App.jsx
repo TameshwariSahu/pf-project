@@ -26,7 +26,7 @@ function App() {
           path="/login"
           element={
             !user ? (
-              <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-400 to-blue-400">
+              <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
                 <Login setUser={setUser} isFinance={loginType === "finance"} setLoginType={setLoginType} loginType={loginType} />
               </div>
             ) : (
