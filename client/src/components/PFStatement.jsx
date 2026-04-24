@@ -175,7 +175,7 @@ function PFStatement({ user = {}, setUser }) {
       </button>
      <button
           onClick={() => navigate("/register")}
-          className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-700 active:scale-95 transition-all duration-150"
+          className="flex items-center gap-2 bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-700 active:scale-95 transition-all duration-150"
         >
           <span className="text-base leading-none">+</span>
           New Register
