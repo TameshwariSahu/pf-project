@@ -45,6 +45,7 @@ function PFStatement({ user = {}, setUser }) {
       setEps(parsed.eps || {});
       setEmpName(parsed.empName || "");
       setDepartment(parsed.department || "");
+      if (result[0].year) setYear(result[0].year);
       setPfNo(parsed.pfNo || "");
     }
   }, []);
@@ -85,6 +86,7 @@ function PFStatement({ user = {}, setUser }) {
       }
       setEmpName(result[0].name || "");
       setDepartment(result[0].department || "");
+       if (result[0].year) setYear(result[0].year);
       let nb = {}, nd = {}, nv = {}, ne = {};
       result.forEach(row => { nb[row.month] = row.basic; nd[row.month] = row.da; nv[row.month] = row.vpf; ne[row.month] = row.eps; });
       setOriginalBasic(nb); setOriginalDA(nd); setOriginalVPF(nv); setOriginalEPS(ne);
