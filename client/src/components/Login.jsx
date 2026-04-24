@@ -125,6 +125,7 @@ function Login({ setUser, isFinance, setLoginType, loginType }) {
                   type="password"
                   placeholder="Enter password"
                   value={password}
+                   autoComplete="off"
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900"
                 />
