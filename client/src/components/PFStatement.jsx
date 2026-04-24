@@ -145,7 +145,7 @@ function PFStatement({ user = {}, setUser }) {
     pdf.save("pf-statement.pdf");
   };
 
-  const isFinance = localStorage.getItem("role") === "finance";
+  const isFinance = localStorage.getItem("role") === "admin";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -243,11 +243,7 @@ function PFStatement({ user = {}, setUser }) {
                   className="w-full border border-gray-300 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
                   value={pfNo}
                   placeholder="Enter PF No."
-                  onChange={e => {
-                    const val = e.target.value;
-                    setPfNo(val);
-                    if (val.trim().length >= 5) fetchPFData(val.trim());
-                  }}
+                  onChange={e => setPfNo(e.target.value)}
                 />
                 <button
                   onClick={() => fetchPFData()}

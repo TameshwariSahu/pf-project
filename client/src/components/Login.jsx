@@ -56,7 +56,7 @@ function Login({ setUser, isFinance }) {
 
         setUser(data);
 
-       if (data.role === "finance") {
+       if (data.role === "admin"){
           navigate("/form");
         } else {
           navigate("/userView");

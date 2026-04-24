@@ -54,7 +54,7 @@ function App() {
           path="/"
           element={
             user ? (
-              user.role === "finance" ? <Navigate to="/form" /> : <Navigate to="/userView" />
+              user.role === "admin" ? <Navigate to="/form" /> : <Navigate to="/userView" />
             ) : (
               <Navigate to="/login" />
             )
