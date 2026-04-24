@@ -41,7 +41,7 @@ function App() {
                     Finance Login
                   </button>
                 </div>
-                <Login setUser={setUser} isFinance={loginType === "finance"} />
+                <Login setUser={setUser} isFinance={loginType === "finance"} setLoginType={setLoginType} loginType={loginType} />
               </div>
             ) : (
               <Navigate to="/" />
