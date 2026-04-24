@@ -174,6 +174,12 @@ function PFStatement({ user = {}, setUser }) {
         DA Page →
       </button>
       <button
+        onClick={() => navigate("/register")}
+        className="bg-blue text-white-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-100 transition"
+      >
+        New Register
+      </button>
+      <button
         onClick={() => {
           setUser(null);
           localStorage.clear();

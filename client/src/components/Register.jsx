@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 function Register() {
   const [userid, setUserid] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("admin");
+  const navigate = useNavigate();
 
   const handleRegister = async () => {
     try {
