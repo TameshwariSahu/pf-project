@@ -27,20 +27,6 @@ function App() {
           element={
             !user ? (
               <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-400 to-blue-400">
-                <div className="flex gap-4 mb-4">
-                  <button
-                    onClick={() => setLoginType("normal")}
-                    className={`px-6 py-2 rounded-full font-semibold ${loginType === "normal" ? "bg-white text-purple-600" : "bg-purple-200 text-gray-700"}`}
-                  >
-                    User Login
-                  </button>
-                  <button
-                    onClick={() => setLoginType("finance")}
-                    className={`px-6 py-2 rounded-full font-semibold ${loginType === "finance" ? "bg-white text-purple-600" : "bg-purple-200 text-gray-700"}`}
-                  >
-                    Finance Login
-                  </button>
-                </div>
                 <Login setUser={setUser} isFinance={loginType === "finance"} setLoginType={setLoginType} loginType={loginType} />
               </div>
             ) : (
