@@ -61,85 +61,87 @@ function Login({ setUser, isFinance, setLoginType, loginType }) {
     }
   };
 
- return (
-  <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-    <div className="w-full max-w-sm bg-white rounded-2xl overflow-hidden shadow-lg">
-      <div className="flex">
-        
-        {/* LEFT - Branding */}
-        <div className="bg-gray-900 w-2/5 flex flex-col items-center justify-center px-4 py-10 gap-3">
-          <div className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 text-xs font-bold tracking-wide">
-            NMDC
+  return (
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+      <div className="w-full max-w-sm bg-white rounded-2xl overflow-hidden shadow-lg">
+        <div className="flex">
+
+          {/* LEFT - Branding */}
+          <div className="bg-gray-900 w-2/5 flex flex-col items-center justify-center px-4 py-10 gap-3">
+            <div className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 text-xs font-bold tracking-wide">
+              NMDC
+            </div>
+            <div className="text-center">
+              <p className="text-white text-xs font-semibold leading-snug">PF Trust</p>
+              <p className="text-gray-500 text-xs mt-1 leading-snug">Kirandul<br />Complex</p>
+            </div>
           </div>
-          <div className="text-center">
-            <p className="text-white text-xs font-semibold leading-snug">PF Trust</p>
-            <p className="text-gray-500 text-xs mt-1 leading-snug">Kirandul<br />Complex</p>
+
+          {/* RIGHT - Form */}
+          <div className="flex-1 px-5 py-8 flex flex-col justify-center">
+            <h2 className="text-sm font-semibold text-gray-800 mb-4">Welcome back</h2>
+
+            {/* Tab Toggle */}
+            <div className="flex gap-2 mb-4">
+              <button
+                type="button"
+                onClick={() => setLoginType("normal")}
+                className={`flex-1 py-1.5 rounded-md text-xs font-semibold border transition ${
+                  loginType === "normal"
+                    ? "bg-gray-900 text-white border-gray-900"
+                    : "text-gray-400 border-gray-200 bg-white"
+                }`}
+              >
+                User
+              </button>
+              <button
+                type="button"
+                onClick={() => setLoginType("finance")}
+                className={`flex-1 py-1.5 rounded-md text-xs font-semibold border transition ${
+                  loginType === "finance"
+                    ? "bg-gray-900 text-white border-gray-900"
+                    : "text-gray-400 border-gray-200 bg-white"
+                }`}
+              >
+                Finance
+              </button>
+            </div>
+
+            {/* ✅ Form wrap */}
+            <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
+              <div className="mb-3">
+                <label className="text-xs text-gray-500 mb-1 block">User ID</label>
+                <input
+                  type="text"
+                  placeholder="Enter user ID"
+                  value={userid}
+                  onChange={(e) => setUserid(e.target.value)}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="text-xs text-gray-500 mb-1 block">Password</label>
+                <input
+                  type="password"
+                  placeholder="Enter password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-gray-900 text-white rounded-lg py-2 text-xs font-semibold hover:bg-gray-700 transition active:scale-95"
+              >
+                Login
+              </button>
+            </form>
+
           </div>
         </div>
-
-        {/* RIGHT - Form */}
-        <div className="flex-1 px-5 py-8 flex flex-col justify-center">
-          <h2 className="text-sm font-semibold text-gray-800 mb-4">Welcome back</h2>
-
-          {/* Tab Toggle */}
-          <div className="flex gap-2 mb-4">
-            <button
-              onClick={() => setLoginType("normal")}
-              className={`flex-1 py-1.5 rounded-md text-xs font-semibold border transition ${
-                loginType === "normal"
-                  ? "bg-gray-900 text-white border-gray-900"
-                  : "text-gray-400 border-gray-200 bg-white"
-              }`}
-            >
-              User
-            </button>
-            <button
-              onClick={() => setLoginType("finance")}
-              className={`flex-1 py-1.5 rounded-md text-xs font-semibold border transition ${
-                loginType === "finance"
-                  ? "bg-gray-900 text-white border-gray-900"
-                  : "text-gray-400 border-gray-200 bg-white"
-              }`}
-            >
-              Finance
-            </button>
-          </div>
-
-          {/* Fields */}
-          <div className="mb-3">
-            <label className="text-xs text-gray-500 mb-1 block">User ID</label>
-            <input
-              type="text"
-              placeholder="Enter user ID"
-              value={userid}
-              onChange={(e) => setUserid(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="text-xs text-gray-500 mb-1 block">Password</label>
-            <input
-              type="password"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900"
-            />
-          </div>
-
-          <button
-            onClick={handleLogin}
-            className="w-full bg-gray-900 text-white rounded-lg py-2 text-xs font-semibold hover:bg-gray-700 transition active:scale-95"
-          >
-            Login
-          </button>
-        </div>
-
       </div>
     </div>
-  </div>
-);
+  );
 }
 
 export default Login;
