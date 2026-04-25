@@ -7,26 +7,39 @@ router.get("/get-all", async (req, res) => {
   try {
     const { category } = req.query;
 
-    const query = `
-      SELECT DISTINCT p.month, p.year,
-        d.da_percent
-      FROM pf_t p
-      LEFT JOIN da_m d ON d.month = p.month 
-        AND d.year = p.year 
-        AND LOWER(d.category) = LOWER(?)
-      ORDER BY p.year,
-      FIELD(p.month,'Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar')
-    `;
+    const months = ["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"];
+    const years = [];
+    for (let i = 2008; i <= 2015; i++) years.push(i);
 
-    const [rows] = await db.promise().query(query, [category]);
-    res.json(rows);
+    const [daRows] = await db.promise().query(
+      `SELECT month, year, da_percent FROM da_m WHERE LOWER(category) = LOWER(?)`,
+      [category]
+    );
+
+    const daMap = {};
+    daRows.forEach(d => { daMap[`${d.month}-${d.year}`] = d.da_percent; });
+
+    const result = [];
+    years.forEach(y => {
+      months.forEach(m => {
+        const yearForMonth = ["Jan","Feb","Mar"].includes(m) ? y + 1 : y;
+        const key = `${m}-${yearForMonth}`;
+        result.push({
+          month: m,
+          year: yearForMonth,
+          da_percent: daMap[key] || null
+        });
+      });
+    });
+
+    res.json(result);
   } catch (err) {
     console.log(err);
     res.status(500).send("Error ❌");
   }
 });
 
-// 🔹 APPLY DA — category ke SAARE employees update karo
+// 🔹 APPLY DA
 router.post("/apply-da", async (req, res) => {
   try {
     const user = req.headers["x-user"] || "unknown";
@@ -36,7 +49,6 @@ router.post("/apply-da", async (req, res) => {
     const IST = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
     const istString = IST.toISOString().slice(0, 19).replace('T', ' ');
 
-    // 1. da_m mein save karo
     await db.promise().query(
       `INSERT INTO da_m (year, month, da_percent, category, created_by, created_at)
        VALUES (?, ?, ?, ?, ?, ?)
@@ -47,7 +59,6 @@ router.post("/apply-da", async (req, res) => {
       [year, month, da_percent, category, user, istString]
     );
 
-    // 2. us category ke SAARE employees ki pf_t update karo
     await db.promise().query(
       `UPDATE pf_t p
        JOIN employee_m e ON p.employee = e.id
