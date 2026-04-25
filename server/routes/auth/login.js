@@ -124,16 +124,15 @@ router.post("/finance-login", (req, res) => {
     res.json({ userid: user.userid, role: user.role, message: "Login ✅" });
   });
 });
-
 router.post("/save-pf", (req, res) => {
   const istString = getISTTime();
-  const { empName, department, pfNo, created_by, data } = req.body;
+  const { empName, department, pfNo, created_by, category, data } = req.body; // ✅ category add
 
   db.query("SELECT id FROM employee_m WHERE pf_no=?", [pfNo], (err, result) => {
     if (err) return res.status(500).send("Error finding employee ❌");
 
     const proceedWithPFInsert = (employeeId) => {
-      let count = 0;
+     let count = 0;
       let hasError = false;
 
       const sql = `
@@ -198,16 +197,17 @@ router.post("/save-pf", (req, res) => {
     };
 
     if (result.length > 0) {
-      proceedWithPFInsert(result[0].id);
+      db.query("UPDATE employee_m SET category=? WHERE pf_no=?", [category, pfNo], () => {
+        proceedWithPFInsert(result[0].id);
+      });
     } else {
       const insertEmp = `
-        INSERT INTO employee_m (name, department, pf_no, created_by, created_at)
-        VALUES (?, ?, ?, ?, ?)
-      `;
+        INSERT INTO employee_m (name, department, pf_no, category, created_by, created_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `; // ✅ category add
 
-      db.query(insertEmp, [empName, department, pfNo, created_by, istString], (err, res2) => {
+      db.query(insertEmp, [empName, department, pfNo, category, created_by, istString], (err, res2) => {
         if (err) return res.status(500).send("Error inserting employee ❌");
-
         proceedWithPFInsert(res2.insertId);
       });
     }
@@ -219,12 +219,12 @@ router.get("/get-pf-by-emp/:pfNo", (req, res) => {
   const pfNo = req.params.pfNo;
 
   const sql = `
-    SELECT pf_t.*, employee_m.name, employee_m.department, employee_m.pf_no
-    FROM pf_t
-    JOIN employee_m ON pf_t.employee = employee_m.id
-    WHERE employee_m.pf_no = ?
-    ORDER BY pf_t.employee, pf_t.year, pf_t.month_order
-  `;
+  SELECT pf_t.*, employee_m.name, employee_m.department, employee_m.pf_no, employee_m.category
+  FROM pf_t
+  JOIN employee_m ON pf_t.employee = employee_m.id
+  WHERE employee_m.pf_no = ?
+  ORDER BY pf_t.employee, pf_t.year, pf_t.month_order
+`;
 
   db.query(sql, [pfNo], (err, result) => {
     if (err) {
