@@ -7,6 +7,7 @@ import UserView from "./components/UserView";
 import CreateDAM from "./components/CreateDAM";
 import LogoutButton from "./components/LogoutButton";
 import Register from "./components/Register";
+import NotFound from "./components/NotFound";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -98,7 +99,7 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         {/* FALLBACK */}
-        <Route path="*" element={<Navigate to={user ? "/" : "/login"} />} />
+       <Route path="*" element={<NotFound user={user} />} />
 
       </Routes>
     </Router>
