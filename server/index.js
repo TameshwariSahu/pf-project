@@ -71,6 +71,13 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Internal server error ❌" });
 });
 
+// Keep alive ping
+setInterval(() => {
+  fetch(`https://your-render-url.onrender.com/ping`)
+    .then(() => console.log("Keep alive ping ✅"))
+    .catch(() => console.log("Ping failed"));
+}, 14 * 60 * 1000); // 14 minutes
+
 const PORT = process.env.PORT || 5000;
 app.get("/ping", (req, res) => res.send("pong"));
 app.listen(PORT, () => {
