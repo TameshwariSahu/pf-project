@@ -10,6 +10,10 @@ router.get("/get-pf", (req, res) => {
   const offset = (page - 1) * limit;
   const search = req.query.search?.trim() || "";
 
+  if (page < 1 || limit < 1) {
+    return res.status(400).json({ error: "Invalid page or limit ❌" });
+  }
+
   const searchParams = search ? [`%${search}%`, `%${search}%`] : [];
 
   const countSql = `
@@ -22,7 +26,7 @@ router.get("/get-pf", (req, res) => {
   db.query(countSql, searchParams, (err, countResult) => {
     if (err) {
       console.log("COUNT ERROR:", err);
-      return res.status(500).json({ error: err.message });
+      return res.status(500).json({ error: "DB Error ❌" });
     }
 
     const total = countResult[0].total;
@@ -40,7 +44,7 @@ router.get("/get-pf", (req, res) => {
     db.query(empSql, [...searchParams, limit, offset], (err, empResult) => {
       if (err) {
         console.log("EMP ERROR:", err);
-        return res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: "DB Error ❌" });
       }
 
       if (empResult.length === 0) {
@@ -51,7 +55,7 @@ router.get("/get-pf", (req, res) => {
       const placeholders = ids.map(() => "?").join(",");
 
       const sql = `
-       SELECT pf_t.*, employee_m.name, employee_m.pf_no, employee_m.department, employee_m.category
+        SELECT pf_t.*, employee_m.name, employee_m.pf_no, employee_m.department, employee_m.category
         FROM pf_t
         JOIN employee_m ON pf_t.employee = employee_m.id
         WHERE employee_m.id IN (${placeholders})
@@ -61,15 +65,20 @@ router.get("/get-pf", (req, res) => {
       db.query(sql, ids, (err, result) => {
         if (err) {
           console.log("QUERY ERROR:", err);
-          return res.status(500).json({ error: err.message });
+          return res.status(500).json({ error: "DB Error ❌" });
         }
         res.json({ data: result, totalPages, currentPage: page, total });
       });
     });
   });
 });
+
 router.get("/get-pf-by-emp/:pfNo", (req, res) => {
   const pfNo = req.params.pfNo;
+
+  if (!pfNo) {
+    return res.status(400).send("PF Number required ❌");
+  }
 
   const sql = `
     SELECT pf_t.*, employee_m.name, employee_m.department, employee_m.pf_no
@@ -81,14 +90,12 @@ router.get("/get-pf-by-emp/:pfNo", (req, res) => {
 
   db.query(sql, [pfNo], (err, result) => {
     if (err) {
-      console.log(err);
-      return res.status(500).send("Error ❌");
+      console.log("GET-PF-BY-EMP ERROR:", err);
+      return res.status(500).send("DB Error ❌");
     }
-
     if (result.length === 0) {
-      return res.status(404).send("No data ❌");
+      return res.status(404).send("No data found ❌");
     }
-
     res.json(result);
   });
 });

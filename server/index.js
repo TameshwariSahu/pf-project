@@ -60,6 +60,17 @@ app.get("/", (req, res) => {
   res.send("Backend working ✅");
 });
 
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found ❌" });
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error("SERVER ERROR:", err.stack);
+  res.status(500).json({ error: "Internal server error ❌" });
+});
+
 const PORT = process.env.PORT || 5000;
 app.get("/ping", (req, res) => res.send("pong"));
 app.listen(PORT, () => {

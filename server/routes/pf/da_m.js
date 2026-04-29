@@ -2,10 +2,13 @@ const express = require("express");
 const router = express.Router();
 const db = require("../../db");
 
-// 🔹 GET ALL MONTHS (category-wise, no employeeId)
 router.get("/get-all", async (req, res) => {
   try {
     const { category } = req.query;
+
+    if (!category) {
+      return res.status(400).send("Category required ❌");
+    }
 
     const months = ["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"];
     const years = [];
@@ -24,26 +27,33 @@ router.get("/get-all", async (req, res) => {
       months.forEach(m => {
         const yearForMonth = ["Jan","Feb","Mar"].includes(m) ? y + 1 : y;
         const key = `${m}-${yearForMonth}`;
-        result.push({
-          month: m,
-          year: yearForMonth,
-          da_percent: daMap[key] || null
-        });
+        result.push({ month: m, year: yearForMonth, da_percent: daMap[key] || null });
       });
     });
 
     res.json(result);
   } catch (err) {
-    console.log(err);
-    res.status(500).send("Error ❌");
+    console.log("GET-ALL ERROR:", err);
+    res.status(500).send("Server error ❌");
   }
 });
 
-// 🔹 APPLY DA
 router.post("/apply-da", async (req, res) => {
   try {
     const user = req.headers["x-user"] || "unknown";
-    let { month, year, da_percent, category } = req.body;
+    const { month, year, da_percent, category } = req.body;
+
+    if (!month || !year || !da_percent || !category) {
+      return res.status(400).send("All fields required ❌");
+    }
+
+    if (!["Worker", "Executive"].includes(category)) {
+      return res.status(400).send("Invalid category ❌");
+    }
+
+    if (da_percent < 0 || da_percent > 100) {
+      return res.status(400).send("Invalid DA percent ❌");
+    }
 
     const now = new Date();
     const IST = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
@@ -70,7 +80,7 @@ router.post("/apply-da", async (req, res) => {
 
     res.send("DA applied for all employees ✅");
   } catch (err) {
-    console.log("DA ERROR:", err);
+    console.log("APPLY-DA ERROR:", err);
     res.status(500).send("Server error ❌");
   }
 });
