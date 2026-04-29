@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import logo from "../components/nmdc.png";
@@ -7,16 +9,32 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 function UserView() {
   const [pfNo, setPfNo] = useState("");
   const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const fetchData = async () => {
-    try {
-      const res = await fetch(`${BASE_URL}/pf/get-pf-by-emp/${pfNo}`);
-      const data = await res.json();
-      setRecords(data);
-    } catch {
-      alert("No data found ❌");
+const fetchData = async () => {
+  if (!pfNo.trim()) { toast.error("Enter PF Number ❌"); return; }
+  setLoading(true);
+  try {
+    const res = await fetch(`${BASE_URL}/pf/get-pf-by-emp/${pfNo}`);
+    if (!res.ok) {
+      setRecords([]);
+      toast.error("No data found ❌");
+      return;
     }
-  };
+    const data = await res.json();
+    if (!data || data.length === 0) {
+      setRecords([]);
+      toast.error("No data found ❌");
+      return;
+    }
+    setRecords(data);
+    toast.success("Data fetched ✅");
+  } catch {
+    toast.error("Server error ❌");
+  } finally {
+    setLoading(false);
+  }
+}
 const downloadPDF = () => {
   const pdf = new jsPDF();
 
@@ -135,9 +153,10 @@ const downloadPDF = () => {
         />
         <button
           onClick={fetchData}
+          disabled={loading}
           className="bg-blue-600 text-white px-4 py-2"
         >
-          Fetch
+           {loading ? "Fetching..." : "Fetch"}
         </button>
       </div>
 
@@ -191,7 +210,7 @@ const downloadPDF = () => {
           )}
         </table>
       )}
-      
+      <ToastContainer />
     </div>
   );
 }

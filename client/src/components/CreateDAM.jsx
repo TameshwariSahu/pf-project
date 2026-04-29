@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -13,24 +15,21 @@ function CreateDAM() {
   const user = localStorage.getItem("userid");
 
   // 🔹 FETCH ALL MONTHS
-  const fetchPF = async () => {
+ const fetchPF = async () => {
   setLoading(true);
   setError("");
   try {
     const res = await fetch(`${BASE_URL}/da_m/get-all?category=${category}`);
+    if (!res.ok) throw new Error("Server error");
     const data = await res.json();
     setPfData(data);
-
     const prefilled = {};
     data.forEach(d => {
-      if (d.da_percent) {
-        prefilled[`${d.month}-${d.year}`] = d.da_percent;
-      }
+      if (d.da_percent) prefilled[`${d.month}-${d.year}`] = d.da_percent;
     });
     setDaValues(prefilled);
-
-  } catch (err) {
-    console.log(err);
+  } catch {
+    toast.error("Error fetching data ❌");
     setError("Error fetching ❌");
   } finally {
     setLoading(false);
@@ -52,32 +51,23 @@ function CreateDAM() {
     const key = `${month}-${year}`;
     const daPercent = daValues[key];
 
-    if (!daPercent) { alert("Enter DA % ❌"); return; }
+     if (!daPercent) { toast.error("Enter DA % ❌"); return; }
+     if (daPercent < 0 || daPercent > 100) { toast.error("Invalid DA % ❌"); return; }
 
-    try {
-      const res = await fetch(`${BASE_URL}/da_m/apply-da`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user": user
-        },
-        body: JSON.stringify({
-          month,
-          year,
-          da_percent: Number(daPercent),
-          category
-        })
-      });
+     try {
+    const res = await fetch(`${BASE_URL}/da_m/apply-da`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-user": user },
+      body: JSON.stringify({ month, year, da_percent: Number(daPercent), category })
+    });
 
-      if (!res.ok) throw new Error("Bad Request");
-      alert(`DA Applied for ALL ${category}s ✅`);
-      fetchPF();
-    } catch (err) {
-      console.log(err);
-      alert("Server Error ❌");
-    }
-  };
-
+        if (!res.ok) throw new Error("Bad Request");
+    toast.success(`DA Applied for ALL ${category}s ✅`);
+    fetchPF();
+  } catch {
+    toast.error("Server Error ❌");
+  }
+};
   return (
     <div className="p-5">
       <button
@@ -144,6 +134,7 @@ function CreateDAM() {
           </tbody>
         </table>
       )}
+      <ToastContainer />
     </div>
   );
 }

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -213,6 +215,7 @@ function ViewData() {
                           </tbody>
                         </table>
                       </div>
+                      
                     )}
                   </div>
                 );
@@ -242,8 +245,23 @@ function ViewData() {
               </button>
             </div>
           )}
-        </>
-      )}
+          onChange={async (e) => {
+          try {
+            const res = await fetch(`${BASE_URL}/pf/update-category`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ employeeId: rows[0]?.employee, category: e.target.value })
+            });
+            if (!res.ok) throw new Error("Failed");
+            toast.success("Category updated ✅");
+            fetchData(currentPage, search);
+          } catch {
+            toast.error("Category update failed ❌");
+          }
+        }}
+        <ToastContainer />
+                </>
+              )}
     </div>
   );
 }
