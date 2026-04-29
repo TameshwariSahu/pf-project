@@ -118,7 +118,9 @@ function PFStatement({ user = {}, setUser }) {
     try {
       const res = await fetch(`${BASE_URL}/auth/save-pf`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json",
+         "Authorization": `Bearer ${localStorage.getItem("token")}` 
+         },
         body: JSON.stringify({ 
           empName, department, pfNo, 
           created_by: user?.userid, 
