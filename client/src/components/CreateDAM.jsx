@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import authFetch from "../utils/authFetch";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 function CreateDAM() {
@@ -55,9 +56,9 @@ function CreateDAM() {
      if (daPercent < 0 || daPercent > 100) { toast.error("Invalid DA % ❌"); return; }
 
      try {
-    const res = await fetch(`${BASE_URL}/da_m/apply-da`, {
+    const res = await authFetch(`${BASE_URL}/da_m/apply-da`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-user": user },
+      headers: { "x-user": user },
       body: JSON.stringify({ month, year, da_percent: Number(daPercent), category })
     });
 

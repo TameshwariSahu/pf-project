@@ -5,6 +5,7 @@ import logo from "./nmdc.png";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import authFetch from "../utils/authFetch";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 function PFStatement({ user = {}, setUser }) {
@@ -116,18 +117,10 @@ function PFStatement({ user = {}, setUser }) {
       employee_share: employeeShare(m), employer_share: employerShare(m), eps: epsValue(m)
     }));
     try {
-      const res = await fetch(`${BASE_URL}/auth/save-pf`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json",
-         "Authorization": `Bearer ${localStorage.getItem("token")}` 
-         },
-        body: JSON.stringify({ 
-          empName, department, pfNo, 
-          created_by: user?.userid, 
-          // category, // 
-          data 
-        })
-      });
+   const res = await authFetch(`${BASE_URL}/auth/save-pf`, {
+  method: "POST",
+  body: JSON.stringify({ empName, department, pfNo, created_by: user?.userid, data })
+    });
       const msg = await res.text();
       toast.success(msg);
     } catch { toast.error("Error saving ❌"); }
