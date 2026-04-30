@@ -5,8 +5,8 @@ const db = require("../../db");
 const jwt = require("jsonwebtoken");
 const { getISTTime } = require('../../utils/time');
 const validate = require("../../middleware/validate");
-const { loginSchema, registerSchema } = require("../../middleware/schemas");
-
+const verifyToken = require("../../middleware/auth");
+const { loginSchema, registerSchema, savePFSchema } = require("../../middleware/schemas");
 const monthOrderMap = {
   Apr:1, May:2, Jun:3, Jul:4, Aug:5, Sep:6,
   Oct:7, Nov:8, Dec:9, Jan:10, Feb:11, Mar:12
@@ -113,9 +113,6 @@ router.post("/save-da", (req, res) => {
 });
 
 // Save PF
-const verifyToken = require("../../middleware/auth");
-const validate = require("../../middleware/validate");
-const { savePFSchema } = require("../../middleware/schemas");
 
 router.post("/save-pf", verifyToken, validate(savePFSchema), (req, res) => {  const istString = getISTTime();
   const { empName, department, pfNo, created_by, category, data } = req.body;
