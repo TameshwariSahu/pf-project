@@ -7,6 +7,7 @@ function Login({ setUser, isFinance, setLoginType, loginType }) {
   const [userid, setUserid] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,8 +24,23 @@ function Login({ setUser, isFinance, setLoginType, loginType }) {
     }
   }, [setUser]);
 
+  const validate = () => {
+    const newErrors = {};
+    if (!userid.trim()) newErrors.userid = "User ID required";
+    if (!password.trim()) newErrors.password = "Password required";
+    else if (password.length < 4) newErrors.password = "Min 4 characters required";
+    return newErrors;
+  };
+
   const handleLogin = async () => {
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    setErrors({});
     setLoading(true);
+
     try {
       const url = isFinance
         ? `${BASE_URL}/auth/finance-login`
@@ -36,13 +52,17 @@ function Login({ setUser, isFinance, setLoginType, loginType }) {
         body: JSON.stringify({ userid, password }),
       });
 
-      if (!res.ok) throw new Error("Server error");
       const data = await res.json();
+
+      if (!res.ok) {
+        setErrors({ server: data.message || "Login failed ❌" });
+        return;
+      }
 
       if (data.userid) {
         localStorage.setItem("role", data.role);
         localStorage.setItem("userid", data.userid);
-         localStorage.setItem("token", data.token);
+        localStorage.setItem("token", data.token); // ✅ token save
 
         if (isFinance) {
           sessionStorage.setItem("financeUser", data.userid);
@@ -56,10 +76,10 @@ function Login({ setUser, isFinance, setLoginType, loginType }) {
         if (data.role === "admin") navigate("/form");
         else navigate("/userView");
       } else {
-        alert(data.message);
+        setErrors({ server: data.message || "Login failed ❌" });
       }
-    } catch (err) {
-      alert("Login error ❌");
+    } catch {
+      setErrors({ server: "Server error — please try again ❌" });
     } finally {
       setLoading(false);
     }
@@ -89,7 +109,7 @@ function Login({ setUser, isFinance, setLoginType, loginType }) {
             <div className="flex gap-2 mb-4">
               <button
                 type="button"
-                onClick={() => setLoginType("normal")}
+                onClick={() => { setLoginType("normal"); setErrors({}); }}
                 className={`flex-1 py-1.5 rounded-md text-xs font-semibold border transition ${
                   loginType === "normal"
                     ? "bg-gray-900 text-white border-gray-900"
@@ -100,7 +120,7 @@ function Login({ setUser, isFinance, setLoginType, loginType }) {
               </button>
               <button
                 type="button"
-                onClick={() => setLoginType("finance")}
+                onClick={() => { setLoginType("finance"); setErrors({}); }}
                 className={`flex-1 py-1.5 rounded-md text-xs font-semibold border transition ${
                   loginType === "finance"
                     ? "bg-gray-900 text-white border-gray-900"
@@ -111,6 +131,13 @@ function Login({ setUser, isFinance, setLoginType, loginType }) {
               </button>
             </div>
 
+            {/* Server Error */}
+            {errors.server && (
+              <div className="mb-3 px-3 py-2 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-500 text-xs">{errors.server}</p>
+              </div>
+            )}
+
             {/* Form */}
             <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
               <div className="mb-3">
@@ -120,10 +147,17 @@ function Login({ setUser, isFinance, setLoginType, loginType }) {
                   placeholder="Enter user ID"
                   value={userid}
                   autoComplete="off"
-                  onChange={(e) => setUserid(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  onChange={(e) => {
+                    setUserid(e.target.value);
+                    if (errors.userid) setErrors(prev => ({ ...prev, userid: "" }));
+                  }}
+                  className={`w-full border rounded-lg px-3 py-2 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 ${
+                    errors.userid ? "border-red-400" : "border-gray-200"
+                  }`}
                 />
+                {errors.userid && <p className="text-red-500 text-xs mt-1">{errors.userid}</p>}
               </div>
+
               <div className="mb-4">
                 <label className="text-xs text-gray-500 mb-1 block">Password</label>
                 <input
@@ -131,10 +165,17 @@ function Login({ setUser, isFinance, setLoginType, loginType }) {
                   placeholder="Enter password"
                   value={password}
                   autoComplete="off"
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (errors.password) setErrors(prev => ({ ...prev, password: "" }));
+                  }}
+                  className={`w-full border rounded-lg px-3 py-2 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 ${
+                    errors.password ? "border-red-400" : "border-gray-200"
+                  }`}
                 />
+                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
               </div>
+
               <button
                 type="submit"
                 disabled={loading}
