@@ -5,9 +5,11 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "i": "^0.3.7",
+    "jsonwebtoken": "^9.0.3",
     "mysql": "^2.18.1",
     "mysql2": "^3.22.0",
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "zod": "^4.4.1"
   },
   "scripts": {
     "dev": "nodemon index.js",
